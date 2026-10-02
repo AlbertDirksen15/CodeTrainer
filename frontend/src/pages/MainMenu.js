@@ -37,7 +37,6 @@ export default function MainMenu() {
   const [errors, setErrors] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [shiftHeld, setShiftHeld] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
 
   const lesson = lessons[currentLessonIndex];
@@ -51,23 +50,6 @@ export default function MainMenu() {
     return keys;
   }, [nextChar]);
 
-  useEffect(() => {
-    const onKeyDown = (event) => {
-      if (event.key === 'Shift') setShiftHeld(true);
-    };
-    const onKeyUp = (event) => {
-      if (event.key === 'Shift') setShiftHeld(false);
-    };
-    const onBlur = () => setShiftHeld(false);
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
-    window.addEventListener('blur', onBlur);
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
-      window.removeEventListener('blur', onBlur);
-    };
-  }, []);
   useEffect(() => {
     localStorage.setItem('ct-theme', theme);
   }, [theme]);
@@ -193,7 +175,8 @@ export default function MainMenu() {
         {keyboardLayout.map((row, rowIndex) => (
           <div className="key-row" key={rowIndex}>
             {row.map((key, keyIndex) => {
-              const display = key.startsWith('Shift') ? 'Shift' : (shiftHeld && baseToShifted[key] ? baseToShifted[key] : key);
+              const display = key.startsWith('Shift') ? 'Shift' : key;
+              const shiftedLabel = baseToShifted[key];
               const targetPhysicalKey = physicalKeyForChar(nextChar);
               const active =
                 key === targetPhysicalKey ||
@@ -205,7 +188,12 @@ export default function MainMenu() {
                   key={`${rowIndex}-${keyIndex}-${key}`}
                   className={`key ${special ? 'key-special' : ''} ${key === 'SPACE' ? 'key-space' : ''} ${active ? 'key-active' : ''}`}
                 >
-                  {display === 'ArrowLeft' ? '←' : display === 'ArrowRight' ? '→' : display}
+                  {shiftedLabel ? (
+                    <span className="key-symbols">
+                      <span>{shiftedLabel}</span>
+                      <span>{display}</span>
+                    </span>
+                  ) : (display === 'ArrowLeft' ? '←' : display === 'ArrowRight' ? '→' : display)}
                 </button>
               );
             })}
