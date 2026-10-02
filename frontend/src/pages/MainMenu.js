@@ -22,6 +22,19 @@ const shiftedToBase = {
 const baseToShifted = Object.fromEntries(
   Object.entries(shiftedToBase).map(([shifted, base]) => [base, shifted])
 );
+const codeToBaseKey = {
+  Backquote: '`',
+  Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4', Digit5: '5',
+  Digit6: '6', Digit7: '7', Digit8: '8', Digit9: '9', Digit0: '0',
+  Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']',
+  Backslash: '\\', Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/',
+  Space: 'SPACE', Enter: 'Enter'
+};
+const physicalKeyFromEvent = (event) => {
+  if (/^Key[A-Z]$/.test(event.code)) return event.code.slice(3);
+  return codeToBaseKey[event.code] || '';
+};
+
 const physicalKeyForChar = (char) => {
   if (shiftedToBase[char]) return shiftedToBase[char];
   if (char === '\n') return 'Enter';
@@ -73,20 +86,18 @@ export default function MainMenu() {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (isPaused || completed) return;
-      if (['Shift','Control','Alt','CapsLock','Tab'].includes(event.key)) return;
+      if (['ShiftLeft','ShiftRight','ControlLeft','ControlRight','AltLeft','AltRight','CapsLock','Tab'].includes(event.code)) return;
 
-      let key = '';
-      if (event.key === ' ') key = ' ';
-      else if (event.key === 'Enter') key = '\n';
-      else if (event.key.length === 1) key = event.key;
-      if (!key) return;
+      const pressedPhysicalKey = physicalKeyFromEvent(event);
+      if (!pressedPhysicalKey) return;
 
-      if (event.key === ' ') event.preventDefault();
-      setIsEnglishLayout(/^[\x20-\x7E]$/.test(event.key) || event.key === 'Enter');
+      const expectedPhysicalKey = physicalKeyForChar(nextChar);
+      if (event.code === 'Space') event.preventDefault();
 
-      if (key === nextChar) {
-        const next = inputText + key;
+      if (pressedPhysicalKey === expectedPhysicalKey) {
+        const next = inputText + nextChar;
         setInputText(next);
+        setIsEnglishLayout(true);
         if (next === targetCommand) setCompleted(true);
       } else {
         setErrors((value) => value + 1);
