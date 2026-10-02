@@ -93,18 +93,20 @@ export default function MainMenu() {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (isPaused || completed) return;
-      if (['ShiftLeft','ShiftRight','ControlLeft','ControlRight','AltLeft','AltRight','CapsLock','Tab'].includes(event.code)) return;
+      if (['Shift','Control','Alt','CapsLock','Tab'].includes(event.key)) return;
 
-      const pressedPhysicalKey = physicalKeyFromEvent(event);
-      if (!pressedPhysicalKey) return;
+      let typedChar = '';
+      if (event.key === ' ') typedChar = ' ';
+      else if (event.key === 'Enter') typedChar = '\n';
+      else if (event.key.length === 1) typedChar = event.key;
+      if (!typedChar) return;
 
-      const typedChar = charFromPhysicalKey(pressedPhysicalKey, event.shiftKey);
-      if (event.code === 'Space') event.preventDefault();
+      if (event.key === ' ') event.preventDefault();
+      setIsEnglishLayout(/^[\x20-\x7E]$/.test(event.key) || event.key === 'Enter');
 
       if (typedChar === nextChar) {
-        const next = inputText + nextChar;
+        const next = inputText + typedChar;
         setInputText(next);
-        setIsEnglishLayout(true);
         if (next === targetCommand) setCompleted(true);
       } else {
         setErrors((value) => value + 1);
