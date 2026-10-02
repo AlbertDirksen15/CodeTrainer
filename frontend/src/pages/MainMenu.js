@@ -22,7 +22,13 @@ const shiftedToBase = {
 const baseToShifted = Object.fromEntries(
   Object.entries(shiftedToBase).map(([shifted, base]) => [base, shifted])
 );
-const physicalKeyForChar = (char) => shiftedToBase[char] || keyLabel(char);
+const physicalKeyForChar = (char) => {
+  if (shiftedToBase[char]) return shiftedToBase[char];
+  if (char === '\n') return 'Enter';
+  if (char === ' ') return 'SPACE';
+  if (/^[a-zA-Z]$/.test(char || '')) return char.toUpperCase();
+  return char || '';
+};
 
 export default function MainMenu() {
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
@@ -188,7 +194,7 @@ export default function MainMenu() {
           <div className="key-row" key={rowIndex}>
             {row.map((key, keyIndex) => {
               const display = key.startsWith('Shift') ? 'Shift' : (shiftHeld && baseToShifted[key] ? baseToShifted[key] : key);
-              const targetPhysicalKey = shiftedToBase[nextChar] || keyLabel(nextChar);
+              const targetPhysicalKey = physicalKeyForChar(nextChar);
               const active =
                 key === targetPhysicalKey ||
                 (requiresShift(nextChar) && key === 'Shift-Left');
