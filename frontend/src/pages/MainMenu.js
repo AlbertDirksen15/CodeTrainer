@@ -43,6 +43,13 @@ const physicalKeyForChar = (char) => {
   return char || '';
 };
 
+const charFromPhysicalKey = (physicalKey, shiftKey) => {
+  if (physicalKey === 'Enter') return '\n';
+  if (physicalKey === 'SPACE') return ' ';
+  if (/^[A-Z]$/.test(physicalKey)) return shiftKey ? physicalKey : physicalKey.toLowerCase();
+  return shiftKey && baseToShifted[physicalKey] ? baseToShifted[physicalKey] : physicalKey;
+};
+
 export default function MainMenu() {
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [inputText, setInputText] = useState('');
@@ -91,10 +98,10 @@ export default function MainMenu() {
       const pressedPhysicalKey = physicalKeyFromEvent(event);
       if (!pressedPhysicalKey) return;
 
-      const expectedPhysicalKey = physicalKeyForChar(nextChar);
+      const typedChar = charFromPhysicalKey(pressedPhysicalKey, event.shiftKey);
       if (event.code === 'Space') event.preventDefault();
 
-      if (pressedPhysicalKey === expectedPhysicalKey) {
+      if (typedChar === nextChar) {
         const next = inputText + nextChar;
         setInputText(next);
         setIsEnglishLayout(true);
