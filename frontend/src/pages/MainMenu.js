@@ -38,24 +38,18 @@ export default function MainMenu() {
   }, [nextChar]);
 
   useEffect(() => {
-    const shiftDown = (event) => {
-      if (event.key === 'Shift') setShiftHeld(true);
-    };
-    const shiftUp = (event) => {
-      if (event.key === 'Shift') setShiftHeld(false);
-    };
-    const resetShift = () => setShiftHeld(false);
-
-    window.addEventListener('keydown', shiftDown);
-    window.addEventListener('keyup', shiftUp);
-    window.addEventListener('blur', resetShift);
+    const down = (event) => { if (event.key === 'Shift') setShiftHeld(true); };
+    const up = (event) => { if (event.key === 'Shift') setShiftHeld(false); };
+    const reset = () => setShiftHeld(false);
+    window.addEventListener('keydown', down);
+    window.addEventListener('keyup', up);
+    window.addEventListener('blur', reset);
     return () => {
-      window.removeEventListener('keydown', shiftDown);
-      window.removeEventListener('keyup', shiftUp);
-      window.removeEventListener('blur', resetShift);
+      window.removeEventListener('keydown', down);
+      window.removeEventListener('keyup', up);
+      window.removeEventListener('blur', reset);
     };
   }, []);
-
   useEffect(() => {
     localStorage.setItem('ct-theme', theme);
   }, [theme]);
@@ -181,10 +175,9 @@ export default function MainMenu() {
         {keyboardLayout.map((row, rowIndex) => (
           <div className="key-row" key={rowIndex}>
             {row.map((key, keyIndex) => {
-              const display = key.startsWith('Shift')
-                ? 'Shift'
-                : (shiftHeld && shiftLabels[key] ? shiftLabels[key] : key);
-              const active = nextKeys.includes(key) || nextKeys.includes(display) || (requiresShift(nextChar) && key.startsWith('Shift'));
+              const baseDisplay = key.startsWith('Shift') ? 'Shift' : key;
+              const display = shiftHeld && shiftLabels[key] ? shiftLabels[key] : baseDisplay;
+              const active = nextKeys.includes(key) || nextKeys.includes(baseDisplay) || (requiresShift(nextChar) && key.startsWith('Shift'));
               const special = ['Backspace','Tab','CapsLock','Enter','Shift-Left','Shift-Right','Control','Alt','AltGr','ArrowLeft','ArrowRight'].includes(key);
               return (
                 <button
@@ -211,6 +204,10 @@ export default function MainMenu() {
   '6': '^', '7': '&', '8': '*', '9': '(', '0': ')',
   '-': '_', '=': '+', '[': '{', ']': '}', '\\': '|',
   ';': ':', "'": '"', ',': '<', '.': '>', '/': '?'
+};
+const baseKeyForChar = (char) => {
+  const match = Object.entries(shiftLabels).find((entry) => entry[1] === char);
+  return match ? match[0] : keyLabel(char);
 };
 
 export default function MainMenu() {
