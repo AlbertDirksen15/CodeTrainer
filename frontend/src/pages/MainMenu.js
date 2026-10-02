@@ -3,7 +3,7 @@ import lessons from '../data/lessons.json';
 import React, { useEffect, useMemo, useState } from 'react';
 
 const keyboardLayout = [
-  ['1','2','3','4','5','6','7','8','9','0','-','=','Backspace'],
+  ['`','1','2','3','4','5','6','7','8','9','0','-','=','Backspace'],
   ['Tab','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
   ['CapsLock','A','S','D','F','G','H','J','K','L',';',"'",'Enter'],
   ['Shift-Left','Z','X','C','V','B','N','M',',','.','/','Shift-Right'],
@@ -14,7 +14,7 @@ const requiresShift = (char) => /[A-Z~!@#$%^&*()_+{}|:"<>?]/.test(char || '');
 const keyLabel = (char) => char === '\n' ? 'Enter' : char === ' ' ? 'SPACE' : (char || '').toUpperCase();
 
 const shiftedToBase = {
-  '!': '1', '@': '2', '#': '3', [String.fromCharCode(36)]: '4', '%': '5',
+  '~': '`', '!': '1', '@': '2', '#': '3', [String.fromCharCode(36)]: '4', '%': '5',
   '^': '6', '&': '7', '*': '8', '(': '9', ')': '0',
   '_': '-', '+': '=', '{': '[', '}': ']', '|': '\\',
   ':': ';', '"': "'", '<': ',', '>': '.', '?': '/'
