@@ -22,19 +22,6 @@ const shiftedToBase = {
 const baseToShifted = Object.fromEntries(
   Object.entries(shiftedToBase).map(([shifted, base]) => [base, shifted])
 );
-const codeToBaseKey = {
-  Backquote: '`',
-  Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4', Digit5: '5',
-  Digit6: '6', Digit7: '7', Digit8: '8', Digit9: '9', Digit0: '0',
-  Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']',
-  Backslash: '\\', Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/',
-  Space: 'SPACE', Enter: 'Enter'
-};
-const physicalKeyFromEvent = (event) => {
-  if (/^Key[A-Z]$/.test(event.code)) return event.code.slice(3);
-  return codeToBaseKey[event.code] || '';
-};
-
 const physicalKeyForChar = (char) => {
   if (shiftedToBase[char]) return shiftedToBase[char];
   if (char === '\n') return 'Enter';
@@ -43,17 +30,10 @@ const physicalKeyForChar = (char) => {
   return char || '';
 };
 
-const charFromPhysicalKey = (physicalKey, shiftKey) => {
-  if (physicalKey === 'Enter') return '\n';
-  if (physicalKey === 'SPACE') return ' ';
-  if (/^[A-Z]$/.test(physicalKey)) return shiftKey ? physicalKey : physicalKey.toLowerCase();
-  return shiftKey && baseToShifted[physicalKey] ? baseToShifted[physicalKey] : physicalKey;
-};
-
 export default function MainMenu() {
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [inputText, setInputText] = useState('');
-  const [isEnglishLayout, setIsEnglishLayout] = useState(true);
+  const [isEnglishLayout, setIsEnglishLayout] = useState(null);
   const [errors, setErrors] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -102,7 +82,8 @@ export default function MainMenu() {
       if (!typedChar) return;
 
       if (event.key === ' ') event.preventDefault();
-      setIsEnglishLayout(/^[\x20-\x7E]$/.test(event.key) || event.key === 'Enter');
+      const isAsciiInput = /^[\x20-\x7E]$/.test(event.key) || event.key === 'Enter';
+      setIsEnglishLayout(isAsciiInput);
 
       if (typedChar === nextChar) {
         const next = inputText + typedChar;
@@ -181,8 +162,8 @@ export default function MainMenu() {
           <div className="stat"><span>PROGRESS</span><strong>{progress}%</strong></div>
           <div className="progress-track"><i style={{width: `${progress}%`}} /></div>
           <div className="layout-lamp">
-            <span className={isEnglishLayout ? 'lamp on' : 'lamp'} />
-            <div><small>KEYBOARD</small><strong>{isEnglishLayout ? 'EN' : 'CHECK'}</strong></div>
+            <span className={isEnglishLayout === true ? 'lamp on' : 'lamp'} />
+            <div><small>INPUT</small><strong>{isEnglishLayout === null ? 'WAIT' : isEnglishLayout ? 'LATIN' : 'CHECK'}</strong></div>
           </div>
           <div className="panel-actions">
             <button onClick={restartLesson}>RESTART</button>
