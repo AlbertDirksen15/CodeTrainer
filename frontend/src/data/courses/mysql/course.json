@@ -1,0 +1,73 @@
+{
+  "formatVersion": 1,
+  "id": "mysql",
+  "title": "MySQL",
+  "version": "0.1.0",
+  "technology": "mysql",
+  "language": "en",
+  "explanationLanguage": "ru",
+  "description": "Практический курс SQL на диалекте MySQL.",
+  "tree": [
+    {
+      "id": "queries",
+      "title": "Получение данных",
+      "type": "section",
+      "exercises": [],
+      "children": [
+        {
+          "id": "select-basics",
+          "title": "SELECT: основы",
+          "type": "topic",
+          "exercises": ["mysql-select-001"],
+          "children": []
+        },
+        {
+          "id": "filtering",
+          "title": "WHERE и фильтрация",
+          "type": "topic",
+          "exercises": [],
+          "children": []
+        },
+        {
+          "id": "sorting",
+          "title": "ORDER BY и LIMIT",
+          "type": "topic",
+          "exercises": [],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "multi-table",
+      "title": "Несколько таблиц",
+      "type": "section",
+      "exercises": [],
+      "children": [
+        {"id":"joins","title":"JOIN","type":"topic","exercises":[],"children":[]}
+      ]
+    },
+    {
+      "id": "aggregation",
+      "title": "Агрегация",
+      "type": "section",
+      "exercises": [],
+      "children": []
+    },
+    {
+      "id": "data-change",
+      "title": "Изменение данных",
+      "type": "section",
+      "exercises": [],
+      "children": []
+    },
+    {
+      "id": "schema",
+      "title": "Таблицы и схема",
+      "type": "section",
+      "exercises": [],
+      "children": [
+        {"id":"mysql-specific","title":"Особенности MySQL","type":"topic","exercises":[],"children":[]}
+      ]
+    }
+  ]
+}
