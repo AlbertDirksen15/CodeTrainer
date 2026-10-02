@@ -1,0 +1,21 @@
+{
+  "id": "mysql-select-basics",
+  "title": "SELECT: основы",
+  "exercises": [
+    {
+      "id": "mysql-select-001",
+      "title": "Выбрать все столбцы",
+      "code": "SELECT * FROM movies;",
+      "parts": [
+        {"text":"SELECT","concept":"mysql.select"},
+        {"text":" ","kind":"whitespace"},
+        {"text":"*","concept":"mysql.all-columns"},
+        {"text":" ","kind":"whitespace"},
+        {"text":"FROM","concept":"mysql.from"},
+        {"text":" ","kind":"whitespace"},
+        {"text":"movies","concept":"mysql.table-name"},
+        {"text":";","concept":"mysql.statement-end"}
+      ]
+    }
+  ]
+}
