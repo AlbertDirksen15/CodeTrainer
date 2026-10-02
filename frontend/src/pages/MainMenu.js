@@ -22,6 +22,24 @@ const shiftedToBase = {
 const baseToShifted = Object.fromEntries(
   Object.entries(shiftedToBase).map(([shifted, base]) => [base, shifted])
 );
+const codeToBaseKey = {
+  Backquote: '`',
+  Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4', Digit5: '5',
+  Digit6: '6', Digit7: '7', Digit8: '8', Digit9: '9', Digit0: '0',
+  Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']',
+  Backslash: '\\', Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/',
+  Space: 'SPACE', Enter: 'Enter'
+};
+const physicalKeyFromEvent = (event) => {
+  if (/^Key[A-Z]$/.test(event.code)) return event.code.slice(3);
+  return codeToBaseKey[event.code] || '';
+};
+const charFromPhysicalKey = (key, shift) => {
+  if (key === 'Enter') return '\n';
+  if (key === 'SPACE') return ' ';
+  if (/^[A-Z]$/.test(key)) return shift ? key : key.toLowerCase();
+  return shift && baseToShifted[key] ? baseToShifted[key] : key;
+};
 const physicalKeyForChar = (char) => {
   if (shiftedToBase[char]) return shiftedToBase[char];
   if (char === '\n') return 'Enter';
@@ -34,6 +52,7 @@ export default function MainMenu() {
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [inputText, setInputText] = useState('');
   const [isEnglishLayout, setIsEnglishLayout] = useState(null);
+  const [layoutCheck, setLayoutCheck] = useState(() => localStorage.getItem('ct-layout-check') === 'on');
   const [errors, setErrors] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -53,6 +72,10 @@ export default function MainMenu() {
   useEffect(() => {
     localStorage.setItem('ct-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('ct-layout-check', layoutCheck ? 'on' : 'off');
+  }, [layoutCheck]);
 
   const playErrorSound = () => {
     try {
@@ -76,12 +99,17 @@ export default function MainMenu() {
       if (['Shift','Control','Alt','CapsLock','Tab'].includes(event.key)) return;
 
       let typedChar = '';
-      if (event.key === ' ') typedChar = ' ';
-      else if (event.key === 'Enter') typedChar = '\n';
-      else if (event.key.length === 1) typedChar = event.key;
+      if (layoutCheck) {
+        if (event.key === ' ') typedChar = ' ';
+        else if (event.key === 'Enter') typedChar = '\n';
+        else if (event.key.length === 1) typedChar = event.key;
+      } else {
+        const physicalKey = physicalKeyFromEvent(event);
+        if (physicalKey) typedChar = charFromPhysicalKey(physicalKey, event.shiftKey);
+      }
       if (!typedChar) return;
 
-      if (event.key === ' ') event.preventDefault();
+      if (event.code === 'Space') event.preventDefault();
       const isAsciiInput = /^[\x20-\x7E]$/.test(event.key) || event.key === 'Enter';
       setIsEnglishLayout(isAsciiInput);
 
@@ -99,7 +127,7 @@ export default function MainMenu() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inputText, nextChar, targetCommand, completed, isPaused]);
+  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck]);
 
   const restartLesson = () => {
     setInputText('');
@@ -162,8 +190,18 @@ export default function MainMenu() {
           <div className="stat"><span>PROGRESS</span><strong>{progress}%</strong></div>
           <div className="progress-track"><i style={{width: `${progress}%`}} /></div>
           <div className="layout-lamp">
-            <span className={isEnglishLayout === true ? 'lamp on' : 'lamp'} />
-            <div><small>INPUT</small><strong>{isEnglishLayout === null ? 'WAIT' : isEnglishLayout ? 'LATIN' : 'CHECK'}</strong></div>
+            <span className={layoutCheck ? (isEnglishLayout === true ? 'lamp on' : 'lamp') : 'lamp on'} />
+            <div>
+              <small>LAYOUT CHECK</small>
+              <strong>{layoutCheck ? 'ON' : 'OFF'}</strong>
+            </div>
+            <button
+              className="theme-toggle"
+              onClick={() => setLayoutCheck((value) => !value)}
+              title={layoutCheck ? 'Require actual Windows input characters' : 'Use physical keys as US layout'}
+            >
+              {layoutCheck ? 'TURN OFF' : 'TURN ON'}
+            </button>
           </div>
           <div className="panel-actions">
             <button onClick={restartLesson}>RESTART</button>
