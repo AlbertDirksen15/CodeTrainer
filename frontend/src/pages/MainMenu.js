@@ -20,7 +20,6 @@ export default function MainMenu() {
   const [errors, setErrors] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [shiftPressed, setShiftPressed] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
 
   const lesson = lessons[currentLessonIndex];
@@ -56,10 +55,6 @@ export default function MainMenu() {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === 'Shift') {
-        setShiftPressed(true);
-        return;
-      }
       if (isPaused || completed) return;
       if (['Shift','Control','Alt','CapsLock','Tab'].includes(event.key)) return;
 
@@ -84,19 +79,8 @@ export default function MainMenu() {
       }
     };
 
-    const handleKeyUp = (event) => {
-      if (event.key === 'Shift') setShiftPressed(false);
-    };
-    const handleBlur = () => setShiftPressed(false);
-
     window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    window.addEventListener('blur', handleBlur);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('blur', handleBlur);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [inputText, nextChar, targetCommand, completed, isPaused]);
 
   const restartLesson = () => {
@@ -174,9 +158,8 @@ export default function MainMenu() {
         {keyboardLayout.map((row, rowIndex) => (
           <div className="key-row" key={rowIndex}>
             {row.map((key, keyIndex) => {
-              const baseDisplay = key.startsWith('Shift') ? 'Shift' : key;
-              const display = displayKeyLabel(key, shiftPressed);
-              const active = nextKeys.includes(baseDisplay) || nextKeys.includes(display) || (requiresShift(nextChar) && key.startsWith('Shift'));
+              const display = key.startsWith('Shift') ? 'Shift' : key;
+              const active = nextKeys.includes(display) || (requiresShift(nextChar) && key.startsWith('Shift'));
               const special = ['Backspace','Tab','CapsLock','Enter','Shift-Left','Shift-Right','Control','Alt','AltGr','ArrowLeft','ArrowRight'].includes(key);
               return (
                 <button
@@ -184,7 +167,7 @@ export default function MainMenu() {
                   key={`${rowIndex}-${keyIndex}-${key}`}
                   className={`key ${special ? 'key-special' : ''} ${key === 'SPACE' ? 'key-space' : ''} ${active ? 'key-active' : ''}`}
                 >
-                  {display}
+                  {display === 'ArrowLeft' ? '←' : display === 'ArrowRight' ? '→' : display}
                 </button>
               );
             })}
