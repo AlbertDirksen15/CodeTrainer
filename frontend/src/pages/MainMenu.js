@@ -32,7 +32,7 @@ export default function MainMenu() {
   const maxErrors = Math.max(1, Math.ceil(targetCommand.length * 0.03));
   const progress = Math.round((inputText.length / targetCommand.length) * 100);
   const nextKeys = useMemo(() => {
-    const keys = [keyLabel(nextChar)];
+    const keys = [baseKeyForChar(nextChar)];
     if (requiresShift(nextChar)) keys.push('Shift');
     return keys;
   }, [nextChar]);
@@ -184,7 +184,7 @@ export default function MainMenu() {
               const display = key.startsWith('Shift')
                 ? 'Shift'
                 : (shiftHeld && shiftLabels[key] ? shiftLabels[key] : key);
-              const active = nextKeys.includes(display) || (requiresShift(nextChar) && key.startsWith('Shift'));
+              const active = nextKeys.includes(key) || nextKeys.includes(display) || (requiresShift(nextChar) && key.startsWith('Shift'));
               const special = ['Backspace','Tab','CapsLock','Enter','Shift-Left','Shift-Right','Control','Alt','AltGr','ArrowLeft','ArrowRight'].includes(key);
               return (
                 <button
