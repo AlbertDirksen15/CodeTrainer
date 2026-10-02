@@ -188,7 +188,10 @@ export default function MainMenu() {
           <div className="key-row" key={rowIndex}>
             {row.map((key, keyIndex) => {
               const display = key.startsWith('Shift') ? 'Shift' : (shiftHeld && baseToShifted[key] ? baseToShifted[key] : key);
-              const active = nextKeys.includes(key);
+              const targetPhysicalKey = shiftedToBase[nextChar] || keyLabel(nextChar);
+              const active =
+                key === targetPhysicalKey ||
+                (requiresShift(nextChar) && key === 'Shift-Left');
               const special = ['Backspace','Tab','CapsLock','Enter','Shift-Left','Shift-Right','Control','Alt','AltGr','ArrowLeft','ArrowRight'].includes(key);
               return (
                 <button
