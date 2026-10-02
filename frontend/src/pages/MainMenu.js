@@ -1,191 +1,184 @@
 import '../index.css';
 import lessons from '../data/lessons.json';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-const MainMenu = () => {
+const keyboardLayout = [
+  ['1','2','3','4','5','6','7','8','9','0','-','=','Backspace'],
+  ['Tab','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
+  ['CapsLock','A','S','D','F','G','H','J','K','L',';',"'",'Enter'],
+  ['Shift-Left','Z','X','C','V','B','N','M',',','.','/','Shift-Right'],
+  ['Control','Alt','SPACE','AltGr','Control','ArrowLeft','ArrowRight']
+];
+
+const requiresShift = (char) => /[A-Z~!@#$%^&*()_+{}|:"<>?]/.test(char || '');
+const keyLabel = (char) => char === '\n' ? 'Enter' : char === ' ' ? 'SPACE' : (char || '').toUpperCase();
+
+export default function MainMenu() {
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [inputText, setInputText] = useState('');
   const [isEnglishLayout, setIsEnglishLayout] = useState(true);
   const [errors, setErrors] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
 
   const lesson = lessons[currentLessonIndex];
   const targetCommand = lesson.text;
   const nextChar = targetCommand[inputText.length] || '';
-  const maxErrors = Math.ceil(targetCommand.length * 0.03);
+  const maxErrors = Math.max(1, Math.ceil(targetCommand.length * 0.03));
+  const progress = Math.round((inputText.length / targetCommand.length) * 100);
+  const nextKeys = useMemo(() => {
+    const keys = [keyLabel(nextChar)];
+    if (requiresShift(nextChar)) keys.push('Shift');
+    return keys;
+  }, [nextChar]);
+
+  useEffect(() => {
+    localStorage.setItem('ct-theme', theme);
+  }, [theme]);
 
   const playErrorSound = () => {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
-    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + 0.1);
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new Ctx();
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      oscillator.type = 'square';
+      oscillator.frequency.value = 440;
+      gain.gain.value = 0.12;
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + 0.08);
+    } catch {}
   };
-
-  const requiresShift = (char) => {
-    const shiftSymbols = [
-      '!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
-      '_', '+', '{', '}', '|', ':', '"', '<', '>', '?',
-      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-      'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-      'U', 'V', 'W', 'X', 'Y', 'Z'
-    ];
-    return shiftSymbols.includes(char);
-  };
-
-  const getKeyLabel = (char) => {
-    if (char === '\n') return 'Enter';
-    if (char === ' ') return 'SPACE';
-    return char.toUpperCase();
-  };
-
-  const nextKeyLabels = requiresShift(nextChar)
-    ? ['Shift', getKeyLabel(nextChar)]
-    : [getKeyLabel(nextChar)];
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (isPaused || completed) return;
+      if (['Shift','Control','Alt','CapsLock','Tab'].includes(event.key)) return;
 
       let key = '';
-      if (event.key === ' ') {
-        key = ' ';
-      } else if (event.key === 'Enter') {
-        key = '\n';
-      } else if (event.key.length === 1) {
-        key = event.key;
-      }
-
+      if (event.key === ' ') key = ' ';
+      else if (event.key === 'Enter') key = '\n';
+      else if (event.key.length === 1) key = event.key;
       if (!key) return;
 
-      const isEnglish = /^[a-zA-Z0-9`~!@#$%^&*()_+\-=[\]{};':"\\|,.<>/? ]$/.test(event.key);
-      setIsEnglishLayout(isEnglish);
+      if (event.key === ' ') event.preventDefault();
+      setIsEnglishLayout(/^[\x20-\x7E]$/.test(event.key) || event.key === 'Enter');
 
       if (key === nextChar) {
-        const newInputText = inputText + key;
-        setInputText(newInputText);
-
-        if (newInputText === targetCommand) {
-          setCompleted(true);
-        }
+        const next = inputText + key;
+        setInputText(next);
+        if (next === targetCommand) setCompleted(true);
       } else {
-        setErrors((prev) => prev + 1);
+        setErrors((value) => value + 1);
         setIsPaused(true);
         playErrorSound();
-        setTimeout(() => setIsPaused(false), 3000);
+        window.setTimeout(() => setIsPaused(false), 1200);
       }
-    };
-
-    const preventSpaceScroll = (event) => {
-      if (event.key === ' ') event.preventDefault();
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keydown', preventSpaceScroll);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keydown', preventSpaceScroll);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [inputText, nextChar, targetCommand, completed, isPaused]);
 
   const restartLesson = () => {
     setInputText('');
     setErrors(0);
     setCompleted(false);
+    setIsPaused(false);
   };
 
   const nextLesson = () => {
     if (currentLessonIndex < lessons.length - 1) {
-      setCurrentLessonIndex((prev) => prev + 1);
-      restartLesson();
+      setCurrentLessonIndex((value) => value + 1);
+      setInputText('');
+      setErrors(0);
+      setCompleted(false);
     }
   };
 
-  const keyboardLayout = [
-    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace'],
-    ['Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\'],
-    ['CapsLock', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', "'", 'Enter'],
-    ['Shift-Left', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', 'Shift-Right'],
-    ['Control', 'Alt', 'SPACE', 'AltGr', 'Control', 'ArrowLeft', 'ArrowRight']
-  ];
-
   return (
-    <div className="w-full h-screen bg-gray-800 border-8 border-gray-500 rounded-lg shadow-lg flex flex-col relative">
+    <main className={`trainer theme-${theme}`}>
       {isPaused && (
-        <div className="overlay">
-          <div className="loader"></div>
-          <p className="text-green-500 text-xl mt-4">
-            Ошибка. Продолжите через несколько секунд...
-          </p>
+        <div className="error-overlay">
+          <div className="error-card">
+            <strong>INPUT ERROR</strong>
+            <span>Проверь символ и продолжай.</span>
+          </div>
         </div>
       )}
 
-      <div className="absolute top-4 right-4 flex items-center justify-center">
-        <div className="lamp-display">
-          <div className={`lamp-indicator ${isEnglishLayout ? 'lamp-active' : 'lamp-inactive'}`}>
-            <span className="lamp-text">{isEnglishLayout ? 'EN' : 'OFF'}</span>
+      <section className="workspace">
+        <div className="screen-shell">
+          <div className="screen-topline">
+            <span>LESSON {String(currentLessonIndex + 1).padStart(2,'0')}</span>
+            <span className="screen-status">● READY</span>
+          </div>
+          <div className="screen-content">
+            <p className="screen-kicker">{lesson.definition}</p>
+            <div className="code-line">
+              <span className="typed">{inputText}</span>
+              {!completed && <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>}
+              <span className="remaining">{targetCommand.slice(inputText.length + (completed ? 0 : 1))}</span>
+            </div>
+          </div>
+          <div className="screen-footer">
+            <span>NEXT KEY: <b>{keyLabel(nextChar) || 'DONE'}</b></span>
+            <span>{completed ? 'LESSON COMPLETE' : 'TYPE TO CONTINUE'}</span>
           </div>
         </div>
-      </div>
 
-      <div className="main-display flex-1 flex flex-col justify-center items-center px-4">
-        <h2 className="text-xl font-bold text-green-400 mb-4">{lesson.definition}</h2>
-        <div className="main-display-text text-white text-lg" style={{ whiteSpace: 'pre-wrap', position: 'relative' }}>
-          <span className="text-green-500">{inputText}</span>
-          {!completed && <span className="caret"></span>}
-          <span className="text-green-200">{targetCommand.slice(inputText.length)}</span>
-        </div>
-        <div className="errors mt-4">
-          <p className="text-red-500">
-            Ошибки: {errors} / {maxErrors}
-          </p>
-        </div>
-      </div>
+        <aside className="info-panel">
+          <div className="panel-heading">
+            <span>SESSION</span>
+            <button className="theme-toggle" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+              {theme === 'light' ? 'DARK' : 'LIGHT'}
+            </button>
+          </div>
+          <div className="stat"><span>USER</span><strong>LOCAL</strong></div>
+          <div className="stat"><span>LESSON</span><strong>{currentLessonIndex + 1}/{lessons.length}</strong></div>
+          <div className="stat"><span>ERRORS</span><strong>{errors}/{maxErrors}</strong></div>
+          <div className="stat"><span>CHARS</span><strong>{inputText.length}/{targetCommand.length}</strong></div>
+          <div className="stat"><span>PROGRESS</span><strong>{progress}%</strong></div>
+          <div className="progress-track"><i style={{width: `${progress}%`}} /></div>
+          <div className="layout-lamp">
+            <span className={isEnglishLayout ? 'lamp on' : 'lamp'} />
+            <div><small>KEYBOARD</small><strong>{isEnglishLayout ? 'EN' : 'CHECK'}</strong></div>
+          </div>
+          <div className="panel-actions">
+            <button onClick={restartLesson}>RESTART</button>
+            <button onClick={nextLesson} disabled={!completed || currentLessonIndex === lessons.length - 1}>NEXT</button>
+          </div>
+        </aside>
+      </section>
 
-      <div className="keyboard flex flex-col items-center mb-8">
+      <section className="keyboard-deck" aria-label="Virtual keyboard">
         {keyboardLayout.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex justify-center mb-2">
-            {row.map((key) => {
-              const displayKey = key.replace(/-.*$/, '');
-              const isNextKey = nextKeyLabels.includes(displayKey);
-
-              const isShiftHighlighted = 
-                requiresShift(nextChar) && (displayKey === 'Shift-Left' || displayKey === 'Shift-Right');
-              const highlightClass = isNextKey || isShiftHighlighted ? 'next-key-highlight' : '';
-
+          <div className="key-row" key={rowIndex}>
+            {row.map((key, keyIndex) => {
+              const display = key.startsWith('Shift') ? 'Shift' : key;
+              const active = nextKeys.includes(display) || (requiresShift(nextChar) && key.startsWith('Shift'));
+              const special = ['Backspace','Tab','CapsLock','Enter','Shift-Left','Shift-Right','Control','Alt','AltGr','ArrowLeft','ArrowRight'].includes(key);
               return (
                 <button
-                  key={`${rowIndex}-${key}`}
-                  className={`keyboard-key ${highlightClass}`}
+                  tabIndex="-1"
+                  key={`${rowIndex}-${keyIndex}-${key}`}
+                  className={`key ${special ? 'key-special' : ''} ${key === 'SPACE' ? 'key-space' : ''} ${active ? 'key-active' : ''}`}
                 >
-                  {displayKey}
+                  {display === 'ArrowLeft' ? '←' : display === 'ArrowRight' ? '→' : display}
                 </button>
               );
             })}
           </div>
         ))}
-      </div>
+      </section>
 
-      <div className="flex justify-around mt-4 mb-8">
-        <button onClick={restartLesson} className="btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
-          Перезапустить
-        </button>
-        <button onClick={nextLesson} className="btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" disabled={!completed || errors > maxErrors}>
-          Следующий урок
-        </button>
-      </div>
-    </div>
+      <footer className="trainer-footer">
+        <span>CODE MEMORY TRAINER // TERMINAL 01</span>
+        <span>VITE BUILD</span>
+      </footer>
+    </main>
   );
-};
-
-export default MainMenu;
+}
