@@ -1,0 +1,7 @@
+[
+  {"id":"mysql.select","token":"SELECT","kind":"keyword","title":"SELECT","explanation":"Выбирает данные."},
+  {"id":"mysql.all-columns","token":"*","kind":"operator","title":"*","explanation":"Выбирает все столбцы."},
+  {"id":"mysql.from","token":"FROM","kind":"keyword","title":"FROM","explanation":"Указывает источник данных — таблицу."},
+  {"id":"mysql.table-name","token":null,"kind":"identifier","title":"Имя таблицы","explanation":"Имя таблицы, из которой читаются данные."},
+  {"id":"mysql.statement-end","token":";","kind":"punctuation","title":";","explanation":"Завершает SQL-инструкцию."}
+]
