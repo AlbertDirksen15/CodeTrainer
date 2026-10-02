@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="220" viewBox="0 0 800 220">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="798" height="218" rx="18" fill="url(#bg)" stroke="#b1362f" stroke-width="2"/>
+  <circle cx="72" cy="70" r="34" fill="#b1362f"/>
+  <text x="72" y="79" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#ffffff">CW</text>
+  <text x="125" y="58" font-family="Arial, Helvetica, sans-serif" font-size="31" font-weight="700" fill="#f0f6fc">Codewars</text>
+  <text x="125" y="91" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#8b949e">albertdirksenDev</text>
+  <rect x="620" y="38" width="135" height="58" rx="12" fill="#11161d" stroke="#f04438" stroke-width="3"/>
+  <text x="687" y="75" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#f04438">8 kyu</text>
+  <line x1="40" y1="118" x2="760" y2="118" stroke="#30363d"/>
+  <text x="55" y="151" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#8b949e">Completed Kata</text>
+  <text x="55" y="181" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#f0f6fc">auto</text>
+  <text x="245" y="151" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#8b949e">Honor</text>
+  <text x="245" y="181" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#f0f6fc">auto</text>
+  <text x="395" y="151" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#8b949e">Leaderboard</text>
+  <text x="395" y="181" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#f0f6fc">auto</text>
+  <text x="585" y="151" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#8b949e">Clan</text>
+  <text x="585" y="181" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="600" fill="#f0f6fc">auto</text>
+</svg>
