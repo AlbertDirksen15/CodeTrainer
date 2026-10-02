@@ -51,6 +51,9 @@ button { font: inherit; }
 .keyboard-deck { max-width:1500px; margin:18px auto 0; padding:clamp(12px,2vw,24px); background:var(--case); border:2px solid var(--key-edge); border-radius:7px; box-shadow:0 8px 20px rgba(0,0,0,.14); overflow-x:auto; }
 .key-row { display:flex; justify-content:center; gap:clamp(3px,.45vw,8px); margin:0 auto clamp(4px,.55vw,9px); min-width:760px; }
 .key { flex:0 1 64px; width:clamp(38px,4.5vw,64px); height:clamp(38px,4.3vw,61px); border:1px solid var(--key-edge); border-bottom-width:4px; border-radius:5px; background:var(--key); color:var(--ink); font-size:clamp(10px,.9vw,14px); font-weight:700; box-shadow:0 2px 3px rgba(0,0,0,.12); }
+.key-symbols { display:grid; place-items:center; line-height:1.05; gap:3px; }
+.key-symbols span:first-child { font-size:12px; }
+.key-symbols span:last-child { font-size:14px; }
 .key-special { flex-basis:92px; width:auto; padding-inline:10px; font-size:11px; }
 .key-space { flex-basis:340px; max-width:340px; }
 .key-active { color:#09200e; background:#79ef91; border-color:#328b45; box-shadow:0 0 0 2px rgba(83,224,111,.25),0 0 18px rgba(83,224,111,.65); transform:translateY(1px); }
