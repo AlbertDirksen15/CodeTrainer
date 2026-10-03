@@ -467,3 +467,33 @@ button { font: inherit; }
 @media (prefers-reduced-motion:reduce) {
   .lesson-complete::before,.complete-scan,.complete-glitch,.complete-bar i,.complete-next { animation:none; }
 }
+
+/* Music control — SETTINGS inside green screen only */
+.music-setting {
+  margin-top:4px;
+  padding-top:10px;
+  border-top:1px solid var(--green-dim);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+.music-setting span {
+  color:#8ab895;
+  font-size:11px;
+  letter-spacing:.06em;
+}
+.music-setting button {
+  padding:7px 10px;
+  border:1px solid var(--green-dim);
+  background:transparent;
+  color:var(--green);
+  font:inherit;
+  font-size:10px;
+  letter-spacing:.08em;
+  cursor:pointer;
+}
+.music-setting button:hover {
+  background:rgba(113,255,141,.08);
+  border-color:var(--green);
+}
