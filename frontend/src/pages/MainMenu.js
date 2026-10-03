@@ -278,10 +278,6 @@ export default function MainMenu() {
               )}
             </div>
           </div>
-          <div className="screen-footer">
-            <span>NEXT KEY: <b>{keyLabel(nextChar) || 'DONE'}</b></span>
-            <span>{completed ? 'LESSON COMPLETE' : 'TYPE TO CONTINUE'}</span>
-          </div>
         </div>
 
         <aside className="info-panel">
