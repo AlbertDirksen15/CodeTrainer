@@ -227,6 +227,36 @@ const startCyberTrack = async () => {
   };
 };
 
+
+const musicModes = [
+  { id: 'ambient', label: 'AMBIENT' },
+  { id: 'track', label: 'CYBER TRACK' },
+  { id: 'terminal-groove', label: 'TERMINAL GROOVE', src: '/Terminal Groove.mp3' },
+  { id: 'night-terminal', label: 'NIGHT TERMINAL', src: '/Night Terminal.mp3' }
+];
+
+const startAudioFile = async (src) => {
+  const audio = new Audio(src);
+  audio.loop = true;
+  audio.volume = 0.55;
+  await audio.play();
+  return () => {
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = '';
+    } catch {}
+  };
+};
+
+const startMusicMode = async (mode) => {
+  if (mode === 'ambient') return startCyberAmbient();
+  if (mode === 'track') return startCyberTrack();
+  const item = musicModes.find((entry) => entry.id === mode);
+  if (item?.src) return startAudioFile(item.src);
+  return startCyberAmbient();
+};
+
 export default function MainMenu() {
   const [selectedCourseId, setSelectedCourseId] = useState(() => localStorage.getItem('ct-course') || 'mysql');
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
@@ -300,7 +330,7 @@ export default function MainMenu() {
       return;
     }
     try {
-      const stopMusic = await (musicMode === 'track' ? startCyberTrack() : startCyberAmbient());
+      const stopMusic = await startMusicMode(musicMode);
       if (stopMusic) {
         musicStopRef.current = stopMusic;
         setMusicOn(true);
@@ -319,7 +349,7 @@ export default function MainMenu() {
     if (!musicOn) return;
     if (musicStopRef.current) musicStopRef.current();
     try {
-      musicStopRef.current = await (mode === 'track' ? startCyberTrack() : startCyberAmbient());
+      musicStopRef.current = await startMusicMode(mode);
     } catch {
       musicStopRef.current = null;
       setMusicOn(false);
@@ -474,9 +504,23 @@ export default function MainMenu() {
                         <button onClick={toggleMusic}>{musicOn ? 'MUSIC OFF' : 'MUSIC ON'}</button>
                       </div>
                       <div className="music-selector">
-                        <button onClick={() => selectMusicMode(musicMode === 'ambient' ? 'track' : 'ambient')} aria-label="Previous music mode">‹</button>
-                        <span>{musicMode === 'ambient' ? 'AMBIENT' : 'CYBER TRACK'}</span>
-                        <button onClick={() => selectMusicMode(musicMode === 'ambient' ? 'track' : 'ambient')} aria-label="Next music mode">›</button>
+                        <button
+                          onClick={() => {
+                            const index = musicModes.findIndex((item) => item.id === musicMode);
+                            const nextIndex = (index - 1 + musicModes.length) % musicModes.length;
+                            selectMusicMode(musicModes[nextIndex].id);
+                          }}
+                          aria-label="Previous music mode"
+                        >‹</button>
+                        <span>{musicModes.find((item) => item.id === musicMode)?.label || 'AMBIENT'}</span>
+                        <button
+                          onClick={() => {
+                            const index = musicModes.findIndex((item) => item.id === musicMode);
+                            const nextIndex = (index + 1) % musicModes.length;
+                            selectMusicMode(musicModes[nextIndex].id);
+                          }}
+                          aria-label="Next music mode"
+                        >›</button>
                       </div>
                     </>}
                   </div>
