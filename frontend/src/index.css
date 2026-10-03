@@ -642,3 +642,15 @@ button { font: inherit; }
     margin-top:10px;
   }
 }
+
+
+/* CODE EXPLAIN: constrain the list so its own hidden scroll can follow the active item. */
+.explain-terminal {
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;
+}
+.explain-terminal-body {
+  min-height:0;
+  height:100%;
+  overscroll-behavior:contain;
+}
