@@ -163,6 +163,13 @@ export default function MainMenu() {
             <span className="screen-status">● READY</span>
           </div>
           <div className="screen-body">
+            <aside className="screen-live-info">
+              <div className="live-info-title">LIVE INFO</div>
+              <div className="live-info-row"><span>STATUS</span><strong>{completed ? 'COMPLETE' : 'TYPING'}</strong></div>
+              <div className="live-info-row"><span>NEXT KEY</span><strong>{keyLabel(nextChar) || 'DONE'}</strong></div>
+              <div className="live-info-row"><span>PROGRESS</span><strong>{progress}%</strong></div>
+              <div className="live-info-row"><span>ERRORS</span><strong>{errors}/{maxErrors}</strong></div>
+            </aside>
             <div className="screen-content">
               <p className="screen-kicker">{lesson.definition}</p>
               <div className="code-line">
@@ -171,13 +178,6 @@ export default function MainMenu() {
                 <span className="remaining">{targetCommand.slice(inputText.length + (completed ? 0 : 1))}</span>
               </div>
             </div>
-            <aside className="screen-live-info">
-              <div className="live-info-title">LIVE INFO</div>
-              <div className="live-info-row"><span>STATUS</span><strong>{completed ? 'COMPLETE' : 'TYPING'}</strong></div>
-              <div className="live-info-row"><span>NEXT KEY</span><strong>{keyLabel(nextChar) || 'DONE'}</strong></div>
-              <div className="live-info-row"><span>PROGRESS</span><strong>{progress}%</strong></div>
-              <div className="live-info-row"><span>ERRORS</span><strong>{errors}/{maxErrors}</strong></div>
-            </aside>
           </div>
           <div className="screen-footer">
             <span>NEXT KEY: <b>{keyLabel(nextChar) || 'DONE'}</b></span>
