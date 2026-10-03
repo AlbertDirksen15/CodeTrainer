@@ -778,3 +778,25 @@ button { font: inherit; }
   text-align:left;
 }
 .theory-table th { color:var(--green); }
+
+
+/* Ordered sub-exercises inside the lecture page only. */
+.lesson-step-list {
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin:0 0 9px;
+}
+.lesson-step-list button {
+  padding:5px 8px;
+}
+.lesson-step-list button b {
+  color:var(--green);
+}
+.lesson-step-list button:disabled {
+  opacity:.28;
+  cursor:not-allowed;
+}
+.lesson-step-list button.done {
+  border-color:var(--green);
+}
