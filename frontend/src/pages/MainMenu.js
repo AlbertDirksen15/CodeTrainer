@@ -472,9 +472,19 @@ export default function MainMenu() {
       setIsEnglishLayout(isAsciiInput);
 
       if (testInput || typedChar === nextChar) {
-        const next = inputText + typedChar;
+        // In TEST INPUT mode the pressed key is ignored, but the lesson still
+        // advances with the correct expected character so completion is real.
+        const acceptedChar = testInput ? nextChar : typedChar;
+        const next = inputText + acceptedChar;
         setInputText(next);
-        if (next === targetCommand) setCompleted(true);
+        if (next === targetCommand) {
+          localStorage.setItem(progressKey, JSON.stringify({
+            completed: true,
+            errors,
+            completedAt: new Date().toISOString()
+          }));
+          setCompleted(true);
+        }
       } else {
         setErrors((value) => value + 1);
         setIsPaused(true);
@@ -485,7 +495,7 @@ export default function MainMenu() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck, menuOpen, testInput]);
+  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck, menuOpen, testInput, progressKey, errors]);
 
   const restartLesson = () => {
     setInputText('');
