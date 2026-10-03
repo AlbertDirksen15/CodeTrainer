@@ -1,7 +1,65 @@
 [
-  {"id":"mysql.select","token":"SELECT","kind":"keyword","title":"SELECT","explanation":"Выбирает данные."},
-  {"id":"mysql.all-columns","token":"*","kind":"operator","title":"*","explanation":"Выбирает все столбцы."},
-  {"id":"mysql.from","token":"FROM","kind":"keyword","title":"FROM","explanation":"Указывает источник данных — таблицу."},
-  {"id":"mysql.table-name","token":null,"kind":"identifier","title":"Имя таблицы","explanation":"Имя таблицы, из которой читаются данные."},
-  {"id":"mysql.statement-end","token":";","kind":"punctuation","title":";","explanation":"Завершает SQL-инструкцию."}
+  {
+    "id": "mysql.select",
+    "token": "SELECT",
+    "kind": "keyword",
+    "title": "SELECT",
+    "explanation": "Выбирает данные."
+  },
+  {
+    "id": "mysql.all-columns",
+    "token": "*",
+    "kind": "operator",
+    "title": "*",
+    "explanation": "Выбирает все столбцы."
+  },
+  {
+    "id": "mysql.from",
+    "token": "FROM",
+    "kind": "keyword",
+    "title": "FROM",
+    "explanation": "Указывает источник данных — таблицу."
+  },
+  {
+    "id": "mysql.table-name",
+    "token": null,
+    "kind": "identifier",
+    "title": "Имя таблицы",
+    "explanation": "Имя таблицы, из которой читаются данные."
+  },
+  {
+    "id": "mysql.where",
+    "token": "WHERE",
+    "kind": "keyword",
+    "title": "WHERE",
+    "explanation": "Фильтрует строки по условию."
+  },
+  {
+    "id": "mysql.column-name",
+    "token": null,
+    "kind": "identifier",
+    "title": "Имя столбца",
+    "explanation": "Столбец, значение которого проверяется."
+  },
+  {
+    "id": "mysql.greater-than",
+    "token": ">",
+    "kind": "operator",
+    "title": ">",
+    "explanation": "Проверяет, что значение больше указанного."
+  },
+  {
+    "id": "mysql.value",
+    "token": null,
+    "kind": "value",
+    "title": "Значение",
+    "explanation": "Значение для сравнения в условии."
+  },
+  {
+    "id": "mysql.statement-end",
+    "token": ";",
+    "kind": "punctuation",
+    "title": ";",
+    "explanation": "Завершает SQL-инструкцию."
+  }
 ]
