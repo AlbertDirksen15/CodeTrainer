@@ -595,7 +595,7 @@ export default function MainMenu() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck, menuOpen, testInput, progressKey, errors, lessonStep, lessonStepIndex, lessonSteps.length, course.id, lesson.id]);
+  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck, menuOpen, testInput, progressKey, errors, lessonStepIndex, lessonSteps.length, course.id, lesson.id]);
 
   const restartLesson = () => {
     setInputText('');
@@ -780,15 +780,15 @@ export default function MainMenu() {
                   </div>
                   <div className="lesson-theory-action">
                     {lessonSteps.length > 0 && <div className="lesson-step-list">
-                      {lessonSteps.map((step, index) => {
-                        const done = JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${step.id}`) || '{}').completed;
+                      {lessonSteps.map((subStep, index) => {
+                        const done = JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${subStep.id}`) || '{}').completed;
                         const previousDone = index === 0 || JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${lessonSteps[index - 1].id}`) || '{}').completed;
-                        return <button key={step.id} disabled={!previousDone} className={done ? 'done' : ''} onClick={() => { if (previousDone) { setLessonStepIndex(index); setInputText(''); setErrors(0); setCompleted(false); setLessonView('exercise'); } }}><b>{step.id}</b> {step.label}{done ? ' ✓' : ''}</button>;
+                        return <button key={subStep.id} disabled={!previousDone} className={done ? 'done' : ''} onClick={() => { if (previousDone) { setLessonStepIndex(index); setInputText(''); setErrors(0); setCompleted(false); setLessonView('exercise'); } }}><b>{subStep.id}</b> {subStep.label}{done ? ' ✓' : ''}</button>;
                       })}
                     </div>}
                     <button onClick={() => {
                       if (lessonSteps.length) {
-                        const firstOpen = lessonSteps.findIndex((step, index) => !JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${step.id}`) || '{}').completed && (index === 0 || JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${lessonSteps[index - 1].id}`) || '{}').completed);
+                        const firstOpen = lessonSteps.findIndex((step, index) => !JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${subStep.id}`) || '{}').completed && (index === 0 || JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${lessonSteps[index - 1].id}`) || '{}').completed);
                         setLessonStepIndex(firstOpen >= 0 ? firstOpen : lessonSteps.length - 1);
                       }
                       setInputText(''); setErrors(0); setCompleted(false); setLessonView('exercise');
