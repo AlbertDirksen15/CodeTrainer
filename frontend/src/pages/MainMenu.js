@@ -67,14 +67,15 @@ const physicalKeyForChar = (char) => {
   return char || '';
 };
 
-const startCyberAmbient = () => {
+const startCyberAmbient = async () => {
   const Ctx = window.AudioContext || window.webkitAudioContext;
   if (!Ctx) return null;
 
   const ctx = new Ctx();
+  if (ctx.state === 'suspended') await ctx.resume();
   const master = ctx.createGain();
   const filter = ctx.createBiquadFilter();
-  master.gain.value = 0.055;
+  master.gain.value = 0.11;
   filter.type = 'lowpass';
   filter.frequency.value = 950;
   filter.Q.value = 1.4;
@@ -191,7 +192,7 @@ export default function MainMenu() {
     if (musicStopRef.current) musicStopRef.current();
   }, []);
 
-  const toggleMusic = () => {
+  const toggleMusic = async () => {
     if (musicOn) {
       if (musicStopRef.current) musicStopRef.current();
       musicStopRef.current = null;
@@ -199,10 +200,16 @@ export default function MainMenu() {
       localStorage.setItem('ct-music', 'off');
       return;
     }
-    musicStopRef.current = startCyberAmbient();
-    if (musicStopRef.current) {
-      setMusicOn(true);
-      localStorage.setItem('ct-music', 'on');
+    try {
+      const stopMusic = await startCyberAmbient();
+      if (stopMusic) {
+        musicStopRef.current = stopMusic;
+        setMusicOn(true);
+        localStorage.setItem('ct-music', 'on');
+      }
+    } catch {
+      setMusicOn(false);
+      localStorage.setItem('ct-music', 'off');
     }
   };
 
