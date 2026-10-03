@@ -323,6 +323,7 @@ export default function MainMenu() {
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuSection, setMenuSection] = useState('COURSES');
+  const [courseMenuId, setCourseMenuId] = useState(null);
   const [musicOn, setMusicOn] = useState(false);
   const [musicMode, setMusicMode] = useState(() => localStorage.getItem('ct-music-mode') || 'ambient');
   const musicStopRef = useRef(null);
@@ -374,12 +375,13 @@ export default function MainMenu() {
     localStorage.setItem('ct-course', selectedCourseId);
   }, [selectedCourseId]);
 
-  const selectCourse = (courseId) => {
+  const selectLessonFromMenu = (courseId, lessonIndex) => {
     setSelectedCourseId(courseId);
-    setCurrentLessonIndex(0);
+    setCurrentLessonIndex(lessonIndex);
     setInputText('');
     setErrors(0);
     setCompleted(false);
+    setCourseMenuId(null);
     setMenuOpen(false);
   };
 
@@ -527,7 +529,7 @@ export default function MainMenu() {
                   <div className="explain-terminal-head">MENU</div>
                   <nav className="side-menu-tabs">
                     {['COURSES','PROGRESS','SETTINGS'].map((section) => (
-                      <button key={section} className={menuSection === section ? 'active' : ''} onClick={() => setMenuSection(section)}>{section}</button>
+                      <button key={section} className={menuSection === section ? 'active' : ''} onClick={() => { setMenuSection(section); if (section !== 'COURSES') setCourseMenuId(null); }}>{section}</button>
                     ))}
                   </nav>
                   <div className="explain-terminal-foot">SYSTEM // MENU</div>
@@ -555,14 +557,34 @@ export default function MainMenu() {
                 <div className="terminal-menu">
                   <div className="terminal-menu-content">
                     {menuSection === 'COURSES' && <>
-                      <strong>COURSES</strong>
-                      <div className="course-choice-list">
-                        {courseCatalog.map((item) => (
-                          <button key={item.id} className={item.id === course.id ? 'selected' : ''} onClick={() => selectCourse(item.id)}>
-                            <b>{item.title}</b><span>{item.description}</span>
-                          </button>
-                        ))}
-                      </div>
+                      {!courseMenuId ? (
+                        <>
+                          <strong>COURSES</strong>
+                          <div className="course-choice-list">
+                            {courseCatalog.map((item) => (
+                              <button key={item.id} className={item.id === course.id ? 'selected' : ''} onClick={() => setCourseMenuId(item.id)}>
+                                <b>{item.title}</b><span>{item.description}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      ) : (() => {
+                        const menuCourse = courseCatalog.find((item) => item.id === courseMenuId);
+                        return (
+                          <>
+                            <strong>{menuCourse?.title || 'COURSE'} // LESSONS</strong>
+                            <div className="course-choice-list">
+                              {(menuCourse?.lessons || []).map((item, index) => (
+                                <button key={item.id} onClick={() => selectLessonFromMenu(menuCourse.id, index)}>
+                                  <b>LESSON {String(index + 1).padStart(2,'0')}</b>
+                                  <span>{item.definition || item.title}</span>
+                                </button>
+                              ))}
+                            </div>
+                            <button className="screen-back" onClick={() => setCourseMenuId(null)}>← BACK TO COURSES</button>
+                          </>
+                        );
+                      })()}
                     </>}
                     {menuSection === 'PROGRESS' && <><strong>PROGRESS // {course.title}</strong><span>{savedLesson.completed || completed ? `LESSON ${String(currentLessonIndex + 1).padStart(2,'0')} // COMPLETE` : `LESSON ${String(currentLessonIndex + 1).padStart(2,'0')} // NOT COMPLETE`}</span><small>{progress}% CURRENT</small></>}
                     {menuSection === 'SETTINGS' && <>
