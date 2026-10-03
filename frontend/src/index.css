@@ -334,3 +334,12 @@ button { font: inherit; }
   place-items:center;
   line-height:1;
 }
+
+/* MENU button: symbol only, no outline/background */
+.hamburger,
+.hamburger:hover {
+  border:0;
+  outline:0;
+  background:transparent;
+  box-shadow:none;
+}
