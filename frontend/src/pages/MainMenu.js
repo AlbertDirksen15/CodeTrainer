@@ -1,15 +1,5 @@
 import '../index.css';
-import mysqlCourse from '../data/courses/mysql/course.json';
-import mysqlSelectLesson from '../data/courses/mysql/lessons/001-select.json';
-import mysqlConcepts from '../data/courses/mysql/concepts.json';
-
-const courseCatalog = [
-  {
-    ...mysqlCourse,
-    lessons: [mysqlSelectLesson],
-    concepts: mysqlConcepts
-  }
-];
+import lessons from '../data/lessons.json';
 import React, { useEffect, useMemo, useState } from 'react';
 
 const keyboardLayout = [
@@ -59,7 +49,6 @@ const physicalKeyForChar = (char) => {
 };
 
 export default function MainMenu() {
-  const [selectedCourseId, setSelectedCourseId] = useState(() => localStorage.getItem('ct-course') || courseCatalog[0].id);
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [inputText, setInputText] = useState('');
   const [isEnglishLayout, setIsEnglishLayout] = useState(null);
@@ -68,30 +57,12 @@ export default function MainMenu() {
   const [completed, setCompleted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
-  const [menuOpen, setMenuOpen] = useState(false);
 
-  const course = courseCatalog.find((item) => item.id === selectedCourseId) || courseCatalog[0];
-  const lessons = course.lessons.flatMap((lessonFile) =>
-    lessonFile.exercises.map((exercise) => ({
-      ...exercise,
-      lessonId: lessonFile.id,
-      definition: exercise.title
-    }))
-  );
-  const lesson = lessons[currentLessonIndex] || lessons[0];
-  const targetCommand = lesson.code;
+  const lesson = lessons[currentLessonIndex];
+  const targetCommand = lesson.text;
   const nextChar = targetCommand[inputText.length] || '';
   const maxErrors = Math.max(1, Math.ceil(targetCommand.length * 0.03));
   const progress = Math.round((inputText.length / targetCommand.length) * 100);
-  const conceptMap = Object.fromEntries((course.concepts || []).map((concept) => [concept.id, concept]));
-  let partOffset = 0;
-  const explainedParts = (lesson.parts || []).map((part) => {
-    const start = partOffset;
-    partOffset += part.text.length;
-    const concept = part.concept ? conceptMap[part.concept] : null;
-    return { ...part, start, end: partOffset, concept };
-  }).filter((part) => part.concept);
-  const activePartIndex = explainedParts.findIndex((part) => inputText.length >= part.start && inputText.length < part.end);
   const nextKeys = useMemo(() => {
     const keys = [physicalKeyForChar(nextChar)];
     if (requiresShift(nextChar)) keys.push('Shift-Left');
@@ -101,33 +72,6 @@ export default function MainMenu() {
   useEffect(() => {
     localStorage.setItem('ct-theme', theme);
   }, [theme]);
-
-  useEffect(() => {
-    localStorage.setItem('ct-course', selectedCourseId);
-  }, [selectedCourseId]);
-
-  const progressKey = `ct-progress:${course.id}:${lesson.id}`;
-  const savedLesson = JSON.parse(localStorage.getItem(progressKey) || '{}');
-
-  useEffect(() => {
-    if (completed) {
-      localStorage.setItem(progressKey, JSON.stringify({
-        completed: true,
-        errors,
-        completedAt: new Date().toISOString()
-      }));
-    }
-  }, [completed, errors, progressKey]);
-
-  const selectCourse = (courseId) => {
-    setSelectedCourseId(courseId);
-    setCurrentLessonIndex(0);
-    setInputText('');
-    setErrors(0);
-    setCompleted(false);
-    setIsPaused(false);
-    setMenuOpen(false);
-  };
 
   useEffect(() => {
     localStorage.setItem('ct-layout-check', layoutCheck ? 'on' : 'off');
@@ -151,7 +95,7 @@ export default function MainMenu() {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (menuOpen || isPaused || completed) return;
+      if (isPaused || completed) return;
       if (['Shift','Control','Alt','CapsLock','Tab'].includes(event.key)) return;
 
       let typedChar = '';
@@ -183,7 +127,7 @@ export default function MainMenu() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck, menuOpen]);
+  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck]);
 
   const restartLesson = () => {
     setInputText('');
@@ -216,52 +160,20 @@ export default function MainMenu() {
         <div className="screen-shell">
           <div className="screen-topline">
             <span>LESSON {String(currentLessonIndex + 1).padStart(2,'0')}</span>
-            <div className="screen-top-actions"><span className="screen-status">{menuOpen ? '● MENU' : '● READY'}</span><button className="hamburger" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle menu">{menuOpen ? '×' : '☰'}</button></div>
+            <span className="screen-status">● READY</span>
           </div>
-          {menuOpen ? (
-            <>
-              <div className="screen-menu">
-                <div className="screen-menu-nav">
-                  <strong>COURSES</strong>
-                  <span>PROGRESS</span>
-                  <span>SETTINGS</span>
-                </div>
-                <div className="screen-course-list">
-                  {courseCatalog.map((item) => {
-                    const exercises = item.lessons.flatMap((file) => file.exercises);
-                    const done = exercises.filter((exercise) =>
-                      JSON.parse(localStorage.getItem(`ct-progress:${item.id}:${exercise.id}`) || '{}').completed
-                    ).length;
-                    return (
-                      <button key={item.id} className={`screen-course ${item.id === course.id ? 'selected' : ''}`} onClick={() => selectCourse(item.id)}>
-                        <span><b>{item.title}</b><small>{item.description}</small></span>
-                        <em>{done}/{exercises.length}</em>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="screen-footer">
-                <span>MENU // COURSES</span>
-                <button className="screen-back" onClick={() => setMenuOpen(false)}>BACK TO LESSON</button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="screen-content">
-                <p className="screen-kicker">{lesson.definition}</p>
-                <div className="code-line">
-                  <span className="typed">{inputText}</span>
-                  {!completed && <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>}
-                  <span className="remaining">{targetCommand.slice(inputText.length + (completed ? 0 : 1))}</span>
-                </div>
-              </div>
-              <div className="screen-footer">
-                <span>NEXT KEY: <b>{keyLabel(nextChar) || 'DONE'}</b></span>
-                <span>{completed ? 'LESSON COMPLETE' : 'TYPE TO CONTINUE'}</span>
-              </div>
-            </>
-          )}
+          <div className="screen-content">
+            <p className="screen-kicker">{lesson.definition}</p>
+            <div className="code-line">
+              <span className="typed">{inputText}</span>
+              {!completed && <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>}
+              <span className="remaining">{targetCommand.slice(inputText.length + (completed ? 0 : 1))}</span>
+            </div>
+          </div>
+          <div className="screen-footer">
+            <span>NEXT KEY: <b>{keyLabel(nextChar) || 'DONE'}</b></span>
+            <span>{completed ? 'LESSON COMPLETE' : 'TYPE TO CONTINUE'}</span>
+          </div>
         </div>
 
         <aside className="info-panel">
@@ -272,7 +184,6 @@ export default function MainMenu() {
             </button>
           </div>
           <div className="stat"><span>USER</span><strong>LOCAL</strong></div>
-          <div className="stat"><span>SAVED</span><strong>{savedLesson.completed ? 'COMPLETE' : 'NOT YET'}</strong></div>
           <div className="stat"><span>LESSON</span><strong>{currentLessonIndex + 1}/{lessons.length}</strong></div>
           <div className="stat"><span>ERRORS</span><strong>{errors}/{maxErrors}</strong></div>
           <div className="stat"><span>CHARS</span><strong>{inputText.length}/{targetCommand.length}</strong></div>
