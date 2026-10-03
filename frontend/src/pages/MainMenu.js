@@ -71,15 +71,7 @@ const courseCatalog = [
     ...mysqlCourse,
     concepts: mysqlConcepts,
     lessons: [mysqlSelectLesson, mysqlWhereLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title,
-      steps: exercise.id === 'mysql-select-001' ? [
-        { id:'1.1', label:'SELECT', code:'SELECT SELECT SELECT SELECT SELECT\nSELECT SELECT SELECT SELECT SELECT\nSELECT SELECT SELECT SELECT SELECT' },
-        { id:'1.2', label:'*', code:'* * * * * * * * * * * * * * *\n* * * * * * * * * * * * * * *\n* * * * * * * * * * * * * * *' },
-        { id:'1.3', label:'FROM', code:'FROM FROM FROM FROM FROM FROM\nFROM FROM FROM FROM FROM FROM\nFROM FROM FROM FROM FROM FROM' },
-        { id:'1.4', label:'movies', code:'movies movies movies movies movies\nmovies movies movies movies movies\nmovies movies movies movies movies' },
-        { id:'1.5', label:'SELECT *', code:'SELECT * SELECT * SELECT * SELECT *\nSELECT * SELECT * SELECT * SELECT *\nSELECT * SELECT * SELECT * SELECT *' },
-        { id:'1.6', label:'SELECT * FROM', code:'SELECT * FROM SELECT * FROM SELECT * FROM\nSELECT * FROM SELECT * FROM SELECT * FROM\nSELECT * FROM SELECT * FROM SELECT * FROM' },
-        { id:'1.7', label:'FULL QUERY', code:'SELECT * FROM movies; SELECT * FROM movies;\nSELECT * FROM movies; SELECT * FROM movies;\nSELECT * FROM movies; SELECT * FROM movies;' }
-      ] : null,
+      steps: exercise.steps || null,
       theory: exercise.id === 'mysql-select-001' ? {
         translations: {
           ru: {
@@ -416,20 +408,13 @@ export default function MainMenu() {
   const savedLesson = JSON.parse(localStorage.getItem(progressKey) || '{}');
   const conceptMap = Object.fromEntries((course.concepts || []).map((concept) => [concept.id, concept]));
   let partOffset = 0;
-  const stepConcepts = lessonStep ? {
-    '1.1': ['mysql.select'],
-    '1.2': ['mysql.all-columns'],
-    '1.3': ['mysql.from'],
-    '1.4': ['mysql.table-name'],
-    '1.5': ['mysql.select', 'mysql.all-columns'],
-    '1.6': ['mysql.select', 'mysql.all-columns', 'mysql.from'],
-    '1.7': ['mysql.select', 'mysql.all-columns', 'mysql.from', 'mysql.table-name', 'mysql.statement-end']
-  }[lessonStep.id] : null;
-  const explainedParts = (lesson.parts || []).map((part) => {
-    const start = partOffset;
-    partOffset += part.text.length;
-    return { ...part, start, end: partOffset, concept: part.concept ? conceptMap[part.concept] : null };
-  }).filter((part) => part.concept && (!stepConcepts || stepConcepts.includes(part.concept.id)));
+  const explainedParts = lessonStep?.explain
+    ? lessonStep.explain.map((item, index) => ({ text:item.text, start:index, end:index + 1, concept:{ explanation:item.description } }))
+    : (lesson.parts || []).map((part) => {
+        const start = partOffset;
+        partOffset += part.text.length;
+        return { ...part, start, end: partOffset, concept: part.concept ? conceptMap[part.concept] : null };
+      }).filter((part) => part.concept);
   const activePartIndex = lessonStep ? 0 : explainedParts.findIndex((part) => inputText.length >= part.start && inputText.length < part.end);
   const nextKeys = useMemo(() => {
     const keys = [physicalKeyForChar(nextChar)];
