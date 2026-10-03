@@ -520,3 +520,33 @@ button { font: inherit; }
   background:rgba(113,255,141,.08);
 }
 .music-modes button.active::before { content:"▶ "; }
+
+/* Compact one-line music selector inside SETTINGS */
+.music-selector {
+  display:grid;
+  grid-template-columns:28px minmax(0,1fr) 28px;
+  align-items:center;
+  width:min(230px,100%);
+  border:1px solid var(--green-dim);
+}
+.music-selector span {
+  text-align:center;
+  color:var(--green);
+  font-size:10px;
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+.music-selector button {
+  height:26px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#8ab895;
+  font:inherit;
+  font-size:16px;
+  cursor:pointer;
+}
+.music-selector button:hover {
+  color:var(--green);
+  background:rgba(113,255,141,.08);
+}
