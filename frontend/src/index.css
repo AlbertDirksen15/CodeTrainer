@@ -95,7 +95,7 @@ button { font: inherit; }
 }
 
 /* Two terminal panes inside the unchanged main screen dimensions. */
-.screen-body { min-height:0; display:grid; grid-template-columns:minmax(190px,1fr) minmax(0,4fr); gap:10px; padding:10px; overflow:hidden; }
+.screen-body { min-height:0; display:grid; grid-template-columns:minmax(190px,1fr) minmax(0,4fr); gap:0; padding:0; overflow:hidden; }
 .explain-terminal,.lesson-terminal { min-width:0; min-height:0; border:0; background:rgba(0,0,0,.12); overflow:hidden; }
 .explain-terminal { display:grid; grid-template-rows:auto minmax(0,1fr) auto; }
 .explain-terminal-head,.explain-terminal-foot { padding:9px 11px; font-size:10px; letter-spacing:.11em; color:var(--green); }
@@ -109,7 +109,7 @@ button { font: inherit; }
 .lesson-terminal { display:flex; }
 .lesson-terminal .screen-content { width:100%; min-height:0; }
 @media (max-width:900px) {
-  .screen-body { grid-template-columns:minmax(170px,26%) minmax(0,1fr); gap:7px; padding:7px; }
+  .screen-body { grid-template-columns:minmax(170px,26%) minmax(0,1fr); gap:0; padding:0; }
 }
 @media (max-width:560px) {
   .screen-body { grid-template-columns:1fr; }
@@ -143,3 +143,6 @@ button { font: inherit; }
 .explain-terminal { border:0 !important; border-right:1px solid var(--green-dim) !important; }
 .lesson-terminal { border:0 !important; }
 .screen-topline,.screen-footer,.explain-terminal-head,.explain-terminal-foot,.terminal-menu-tabs { border-top:0 !important; border-bottom:0 !important; }
+
+.screen-shell { min-height:clamp(300px,47vh,560px); grid-template-rows:auto 1fr auto; }
+.screen-body { height:100%; min-height:0; gap:0 !important; padding:0 !important; }
