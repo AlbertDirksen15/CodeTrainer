@@ -817,3 +817,22 @@ button { font: inherit; }
 .lesson-step-list {
   justify-content:flex-end;
 }
+
+/* Lecture bottom control row: START left, steps right, equal height. */
+.lesson-theory-action {
+  display:flex;
+  align-items:stretch;
+  justify-content:space-between;
+  gap:10px;
+}
+.lesson-theory-action > button,
+.lesson-step-list button {
+  box-sizing:border-box;
+  min-height:30px;
+  height:30px;
+}
+.lesson-step-list {
+  margin:0 0 0 auto;
+  align-items:stretch;
+  align-self:stretch;
+}
