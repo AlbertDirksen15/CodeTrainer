@@ -231,8 +231,8 @@ const startCyberTrack = async () => {
 const musicModes = [
   { id: 'ambient', label: 'AMBIENT' },
   { id: 'track', label: 'CYBER TRACK' },
-  { id: 'terminal-groove', label: 'TERMINAL GROOVE', src: '/Terminal Groove.mp3' },
-  { id: 'night-terminal', label: 'NIGHT TERMINAL', src: '/Night Terminal.mp3' }
+  { id: 'terminal-groove', label: 'TERMINAL GROOVE', src: `${import.meta.env.BASE_URL}Terminal%20Groove.mp3` },
+  { id: 'night-terminal', label: 'NIGHT TERMINAL', src: `${import.meta.env.BASE_URL}Night%20Terminal.mp3` }
 ];
 
 const startAudioFile = async (src) => {
