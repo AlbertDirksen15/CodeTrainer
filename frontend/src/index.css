@@ -323,3 +323,14 @@ button { font: inherit; }
 .explain-line strong { font-size:13px; line-height:1.22; }
 .explain-line span { font-size:12px; line-height:1.25; }
 .explain-terminal-head,.explain-terminal-foot { font-size:12px; }
+
+/* MENU button: identical box for ☰ and × */
+.hamburger {
+  box-sizing:border-box;
+  width:28px;
+  height:22px;
+  padding:0;
+  display:inline-grid;
+  place-items:center;
+  line-height:1;
+}
