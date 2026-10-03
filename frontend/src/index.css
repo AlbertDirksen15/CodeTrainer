@@ -109,7 +109,7 @@ button { font: inherit; }
   .info-panel {
     height:100%;
     min-height:0;
-    overflow:auto;
+    overflow:visible;
   }
   .keyboard-deck {
     margin-top:10px;
