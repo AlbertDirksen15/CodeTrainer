@@ -1,0 +1,77 @@
+{
+  "id": "mysql-where-basics",
+  "title": "WHERE: фильтрация",
+  "exercises": [
+    {
+      "id": "mysql-where-001",
+      "title": "Фильтр по условию",
+      "code": "SELECT * FROM movies WHERE year > 2000;",
+      "parts": [
+        {
+          "text": "SELECT",
+          "concept": "mysql.select"
+        },
+        {
+          "text": " ",
+          "kind": "whitespace"
+        },
+        {
+          "text": "*",
+          "concept": "mysql.all-columns"
+        },
+        {
+          "text": " ",
+          "kind": "whitespace"
+        },
+        {
+          "text": "FROM",
+          "concept": "mysql.from"
+        },
+        {
+          "text": " ",
+          "kind": "whitespace"
+        },
+        {
+          "text": "movies",
+          "concept": "mysql.table-name"
+        },
+        {
+          "text": " ",
+          "kind": "whitespace"
+        },
+        {
+          "text": "WHERE",
+          "concept": "mysql.where"
+        },
+        {
+          "text": " ",
+          "kind": "whitespace"
+        },
+        {
+          "text": "year",
+          "concept": "mysql.column-name"
+        },
+        {
+          "text": " ",
+          "kind": "whitespace"
+        },
+        {
+          "text": ">",
+          "concept": "mysql.greater-than"
+        },
+        {
+          "text": " ",
+          "kind": "whitespace"
+        },
+        {
+          "text": "2000",
+          "concept": "mysql.value"
+        },
+        {
+          "text": ";",
+          "concept": "mysql.statement-end"
+        }
+      ]
+    }
+  ]
+}
