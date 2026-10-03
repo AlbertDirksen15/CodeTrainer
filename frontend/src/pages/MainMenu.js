@@ -213,14 +213,8 @@ export default function MainMenu() {
       )}
 
       <section className="workspace">
-        <div className="screen-shell">
-          <div className="screen-topline">
-            <span>LESSON {String(currentLessonIndex + 1).padStart(2,'0')}</span>
-            <div className="screen-top-actions"><span className="screen-status">{menuOpen ? '● MENU' : '● READY'}</span><button className="hamburger" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle menu">{menuOpen ? '×' : '☰'}</button></div>
-          </div>
-          <div className="screen-main">
-            <aside className="explain-panel">
-<div className="panel-heading"><span>CODE EXPLAIN</span></div>
+        <aside className="explain-panel">
+          <div className="panel-heading"><span>CODE EXPLAIN</span></div>
           <div className="explain-list">
             {explainedParts.map((part, index) => {
               const state = inputText.length >= part.end ? 'done' : index === activePartIndex ? 'active' : 'future';
@@ -235,8 +229,12 @@ export default function MainMenu() {
               );
             })}
           </div>
-            </aside>
-            <div className="lesson-pane">
+        </aside>
+        <div className="screen-shell">
+          <div className="screen-topline">
+            <span>LESSON {String(currentLessonIndex + 1).padStart(2,'0')}</span>
+            <div className="screen-top-actions"><span className="screen-status">{menuOpen ? '● MENU' : '● READY'}</span><button className="hamburger" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle menu">{menuOpen ? '×' : '☰'}</button></div>
+          </div>
           {menuOpen ? (
             <>
               <div className="screen-menu">
@@ -281,8 +279,6 @@ export default function MainMenu() {
               </div>
             </>
           )}
-            </div>
-          </div>
         </div>
 
         <aside className="info-panel">
