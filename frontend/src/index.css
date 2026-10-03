@@ -115,3 +115,18 @@ button { font: inherit; }
   .screen-body { grid-template-columns:1fr; }
   .explain-terminal { display:none; }
 }
+
+.screen-top-actions { display:flex; align-items:center; gap:10px; }
+.hamburger,.screen-back,.terminal-menu-tabs button { border:1px solid var(--green-dim); background:transparent; color:var(--green); font:inherit; cursor:pointer; }
+.hamburger { width:28px; height:24px; padding:0; font-size:15px; line-height:1; }
+.terminal-menu { width:100%; min-height:0; display:grid; grid-template-rows:auto 1fr auto; padding:18px; }
+.terminal-menu-tabs { display:flex; gap:8px; border-bottom:1px solid var(--green-dim); padding-bottom:10px; }
+.terminal-menu-tabs button { padding:6px 9px; font-size:10px; letter-spacing:.08em; }
+.terminal-menu-tabs button.active { background:var(--green); color:var(--screen); }
+.terminal-menu-content { align-self:center; justify-self:center; width:min(520px,90%); display:grid; gap:12px; text-align:center; }
+.terminal-menu-content strong { color:var(--green); font-size:18px; }
+.terminal-menu-content span,.terminal-menu-content small { color:#8ab895; line-height:1.45; }
+.screen-back { justify-self:end; padding:7px 10px; font-size:10px; }
+.explain-line.future { opacity:.38; }
+.explain-line.done { opacity:.68; }
+.explain-line.active { opacity:1; background:rgba(113,255,141,.06); }
