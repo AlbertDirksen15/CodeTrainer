@@ -415,7 +415,17 @@ export default function MainMenu() {
         partOffset += part.text.length;
         return { ...part, start, end: partOffset, concept: part.concept ? conceptMap[part.concept] : null };
       }).filter((part) => part.concept);
-  const activePartIndex = lessonStep ? 0 : explainedParts.findIndex((part) => inputText.length >= part.start && inputText.length < part.end);
+  const activePartIndex = lessonStep
+    ? (() => {
+        if (!explainedParts.length) return -1;
+        const remaining = targetCommand.slice(inputText.length);
+        const nextToken = explainedParts
+          .map((part, index) => ({ index, position: remaining.indexOf(part.text) }))
+          .filter((item) => item.position >= 0)
+          .sort((a, b) => a.position - b.position)[0];
+        return nextToken ? nextToken.index : 0;
+      })()
+    : explainedParts.findIndex((part) => inputText.length >= part.start && inputText.length < part.end);
   const nextKeys = useMemo(() => {
     const keys = [physicalKeyForChar(nextChar)];
     if (requiresShift(nextChar)) keys.push('Shift-Left');
