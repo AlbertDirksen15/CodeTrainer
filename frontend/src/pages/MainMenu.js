@@ -65,12 +65,12 @@ const courseCatalog = [
     title: 'JavaScript',
     description: 'Исходный курс CodeTrainer.',
     concepts: javascriptConcepts,
-    lessons: legacyLessons.map((item) => ({ ...item, id: `js-${item.id}`, code: item.text, parts: javascriptParts[item.id] || [] }))
+    lessons: legacyLessons.map((item) => ({ ...item, id: `js-${item.id}`, code: item.text, parts: javascriptParts[item.id] || [], theory: item.id === 1 ? 'Функция — это именованный блок кода, который можно вызывать много раз. В JavaScript функцию объявляют ключевым словом function. После него указываются имя функции и параметры. Параметры передают данные внутрь функции. Тело находится между фигурными скобками, а return возвращает результат. В упражнении мы создадим функцию greet, которая принимает имя и возвращает приветствие.' : 'Переменные позволяют сохранять данные и обращаться к ним по имени. let используют, когда значение может изменяться. const используют, когда переменную не планируется переназначать. Оператор = присваивает значение. В упражнении мы создадим переменные age и name.' }))
   },
   {
     ...mysqlCourse,
     concepts: mysqlConcepts,
-    lessons: [mysqlSelectLesson, mysqlWhereLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title })))
+    lessons: [mysqlSelectLesson, mysqlWhereLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title, theory: exercise.id === 'mysql-select-001' ? 'SELECT — основная команда SQL для чтения данных из таблицы. После SELECT указывается, какие столбцы нужно получить. Символ * означает все столбцы. FROM указывает таблицу. Запрос SELECT * FROM movies; возвращает все столбцы и строки таблицы movies. Точка с запятой завершает SQL-инструкцию.' : 'WHERE используется для фильтрации строк. После WHERE записывается условие. year > 2000 означает оставить только строки, где значение year больше 2000. SELECT получает данные из movies, а WHERE ограничивает результат по году.' })))
   }
 ];
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -320,6 +320,7 @@ export default function MainMenu() {
   const [errors, setErrors] = useState(0);
   const [testInput, setTestInput] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [lessonView, setLessonView] = useState('theory');
   const [isPaused, setIsPaused] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -403,6 +404,7 @@ export default function MainMenu() {
     setInputText('');
     setErrors(0);
     setCompleted(false);
+    setLessonView('theory');
     setCourseMenuId(null);
     setMenuOpen(false);
   };
@@ -531,6 +533,7 @@ export default function MainMenu() {
       setInputText('');
       setErrors(0);
       setCompleted(false);
+      setLessonView('theory');
     }
   };
 
@@ -565,6 +568,14 @@ export default function MainMenu() {
                     ))}
                   </nav>
                   <div className="explain-terminal-foot">SYSTEM // MENU</div>
+                </>
+              ) : lessonView === 'theory' ? (
+                <>
+                  <div className="explain-terminal-head">LECTURE</div>
+                  <div className="explain-terminal-body">
+                    <div className="explain-line active"><strong>▶ {lesson.definition}</strong><span>Изучите теорию и затем переходите к упражнению.</span></div>
+                  </div>
+                  <div className="explain-terminal-foot">THEORY // {course.title.toUpperCase()}</div>
                 </>
               ) : (
                 <>
@@ -666,6 +677,15 @@ export default function MainMenu() {
                     </>}
                   </div>
                   <button className="screen-back" onClick={() => setMenuOpen(false)}>BACK TO LESSON</button>
+                </div>
+              ) : lessonView === 'theory' ? (
+                <div className="lesson-theory">
+                  <div className="lesson-theory-scroll">
+                    <small>{course.title.toUpperCase()} // LECTURE {String(currentLessonIndex + 1).padStart(2,'0')}</small>
+                    <h2>{lesson.definition}</h2>
+                    <p>{lesson.theory || 'Теоретический материал для этого урока будет добавлен позже.'}</p>
+                  </div>
+                  <div className="lesson-theory-action"><button onClick={() => setLessonView('exercise')}>START EXERCISE →</button></div>
                 </div>
               ) : completed ? (
                 <div className="lesson-complete">
