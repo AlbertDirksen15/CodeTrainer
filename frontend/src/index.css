@@ -136,7 +136,12 @@ button { font: inherit; }
 /* CODE EXPLAIN layout only — no outer geometry changes */
 .explain-terminal-body {
   padding:10px 12px;
-  overflow:hidden;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:none;
+}
+.explain-terminal-body::-webkit-scrollbar {
+  display:none;
 }
 .explain-line {
   display:grid;
