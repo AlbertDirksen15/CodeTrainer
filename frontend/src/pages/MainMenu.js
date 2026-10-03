@@ -2,12 +2,22 @@ import '../index.css';
 import mysqlCourse from '../data/courses/mysql/course.json';
 import mysqlConcepts from '../data/courses/mysql/concepts.json';
 import mysqlSelectLesson from '../data/courses/mysql/lessons/001-select.json';
+import legacyLessons from '../data/lessons.json';
 
-const course = { ...mysqlCourse, concepts: mysqlConcepts, lessonFiles: [mysqlSelectLesson] };
-const lessons = course.lessonFiles.flatMap((file) => file.exercises.map((exercise) => ({
-  ...exercise,
-  definition: exercise.title
-})));
+const courseCatalog = [
+  {
+    id: 'javascript',
+    title: 'JavaScript',
+    description: 'Исходный курс CodeTrainer.',
+    concepts: [],
+    lessons: legacyLessons.map((item) => ({ ...item, id: `js-${item.id}`, code: item.text, parts: [] }))
+  },
+  {
+    ...mysqlCourse,
+    concepts: mysqlConcepts,
+    lessons: [mysqlSelectLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title })))
+  }
+];
 import React, { useEffect, useMemo, useState } from 'react';
 
 const keyboardLayout = [
@@ -57,6 +67,7 @@ const physicalKeyForChar = (char) => {
 };
 
 export default function MainMenu() {
+  const [selectedCourseId, setSelectedCourseId] = useState(() => localStorage.getItem('ct-course') || 'mysql');
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [inputText, setInputText] = useState('');
   const [isEnglishLayout, setIsEnglishLayout] = useState(null);
@@ -68,14 +79,16 @@ export default function MainMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuSection, setMenuSection] = useState('COURSES');
 
-  const lesson = lessons[currentLessonIndex];
+  const course = courseCatalog.find((item) => item.id === selectedCourseId) || courseCatalog[1];
+  const lessons = course.lessons;
+  const lesson = lessons[currentLessonIndex] || lessons[0];
   const targetCommand = lesson.code;
   const nextChar = targetCommand[inputText.length] || '';
   const maxErrors = Math.max(1, Math.ceil(targetCommand.length * 0.03));
   const progress = Math.round((inputText.length / targetCommand.length) * 100);
   const progressKey = `ct-progress:${course.id}:${lesson.id}`;
   const savedLesson = JSON.parse(localStorage.getItem(progressKey) || '{}');
-  const conceptMap = Object.fromEntries(course.concepts.map((concept) => [concept.id, concept]));
+  const conceptMap = Object.fromEntries((course.concepts || []).map((concept) => [concept.id, concept]));
   let partOffset = 0;
   const explainedParts = (lesson.parts || []).map((part) => {
     const start = partOffset;
@@ -92,6 +105,19 @@ export default function MainMenu() {
   useEffect(() => {
     localStorage.setItem('ct-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('ct-course', selectedCourseId);
+  }, [selectedCourseId]);
+
+  const selectCourse = (courseId) => {
+    setSelectedCourseId(courseId);
+    setCurrentLessonIndex(0);
+    setInputText('');
+    setErrors(0);
+    setCompleted(false);
+    setMenuOpen(false);
+  };
 
   useEffect(() => {
     localStorage.setItem('ct-layout-check', layoutCheck ? 'on' : 'off');
@@ -193,31 +219,49 @@ export default function MainMenu() {
           </div>
           <div className="screen-body">
             <aside className="explain-terminal">
-              <div className="explain-terminal-head">CODE EXPLAIN</div>
-              <div className="explain-terminal-body">
-                {explainedParts.map((part, index) => {
-                  const state = inputText.length >= part.end ? 'done' : index === activePartIndex ? 'active' : 'future';
-                  return (
-                    <div className={`explain-line ${state}`} key={`${part.start}-${part.text}`}>
-                      <strong>{state === 'done' ? '✓' : state === 'active' ? '▶' : '·'} {part.text}</strong>
-                      <span>{part.concept.explanation}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="explain-terminal-foot">SYNTAX // {course.title.toUpperCase()}</div>
-            </aside>
-            <div className="lesson-terminal">
               {menuOpen ? (
-                <div className="terminal-menu">
-                  <nav className="terminal-menu-tabs">
+                <>
+                  <div className="explain-terminal-head">MENU</div>
+                  <nav className="side-menu-tabs">
                     {['COURSES','PROGRESS','SETTINGS'].map((section) => (
                       <button key={section} className={menuSection === section ? 'active' : ''} onClick={() => setMenuSection(section)}>{section}</button>
                     ))}
                   </nav>
+                  <div className="explain-terminal-foot">SYSTEM // MENU</div>
+                </>
+              ) : (
+                <>
+                  <div className="explain-terminal-head">CODE EXPLAIN</div>
+                  <div className="explain-terminal-body">
+                    {explainedParts.length ? explainedParts.map((part, index) => {
+                      const state = inputText.length >= part.end ? 'done' : index === activePartIndex ? 'active' : 'future';
+                      return (
+                        <div className={`explain-line ${state}`} key={`${part.start}-${part.text}`}>
+                          <strong>{state === 'done' ? '✓' : state === 'active' ? '▶' : '·'} {part.text}</strong>
+                          <span>{part.concept.explanation}</span>
+                        </div>
+                      );
+                    }) : <div className="explain-line active"><strong>▶ {course.title}</strong><span>{lesson.definition}</span></div>}
+                  </div>
+                  <div className="explain-terminal-foot">SYNTAX // {course.title.toUpperCase()}</div>
+                </>
+              )}
+            </aside>
+            <div className="lesson-terminal">
+              {menuOpen ? (
+                <div className="terminal-menu">
                   <div className="terminal-menu-content">
-                    {menuSection === 'COURSES' && <><strong>{course.title}</strong><span>{course.description}</span><small>01 // {lesson.title}</small></>}
-                    {menuSection === 'PROGRESS' && <><strong>PROGRESS</strong><span>{savedLesson.completed ? 'LESSON 01 // COMPLETE' : 'LESSON 01 // NOT COMPLETE'}</span><small>{progress}% CURRENT</small></>}
+                    {menuSection === 'COURSES' && <>
+                      <strong>COURSES</strong>
+                      <div className="course-choice-list">
+                        {courseCatalog.map((item) => (
+                          <button key={item.id} className={item.id === course.id ? 'selected' : ''} onClick={() => selectCourse(item.id)}>
+                            <b>{item.title}</b><span>{item.description}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </>}
+                    {menuSection === 'PROGRESS' && <><strong>PROGRESS // {course.title}</strong><span>{savedLesson.completed ? 'LESSON 01 // COMPLETE' : 'LESSON 01 // NOT COMPLETE'}</span><small>{progress}% CURRENT</small></>}
                     {menuSection === 'SETTINGS' && <><strong>SETTINGS</strong><span>LAYOUT CHECK // {layoutCheck ? 'ON' : 'OFF'}</span><small>THEME // {theme.toUpperCase()}</small></>}
                   </div>
                   <button className="screen-back" onClick={() => setMenuOpen(false)}>BACK TO LESSON</button>
