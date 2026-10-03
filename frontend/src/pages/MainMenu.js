@@ -788,7 +788,7 @@ export default function MainMenu() {
                     </div>}
                     <button onClick={() => {
                       if (lessonSteps.length) {
-                        const firstOpen = lessonSteps.findIndex((step, index) => !JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${subStep.id}`) || '{}').completed && (index === 0 || JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${lessonSteps[index - 1].id}`) || '{}').completed);
+                        const firstOpen = lessonSteps.findIndex((subStep, index) => !JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${subStep.id}`) || '{}').completed && (index === 0 || JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${lessonSteps[index - 1].id}`) || '{}').completed));
                         setLessonStepIndex(firstOpen >= 0 ? firstOpen : lessonSteps.length - 1);
                       }
                       setInputText(''); setErrors(0); setCompleted(false); setLessonView('exercise');
