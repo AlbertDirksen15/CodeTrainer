@@ -8,7 +8,11 @@ Interactive code memorization and touch-typing trainer for learning programming 
 
 ## Preview
 
-[![CodeTrainer live preview](https://image.thum.io/get/width/1400/crop/900/noanimate/https://albertdirksen15.github.io/CodeTrainer/)](https://albertdirksen15.github.io/CodeTrainer/)
+<p align="center">
+  <a href="https://albertdirksen15.github.io/CodeTrainer/">
+    <img src="https://image.thum.io/get/width/1200/noanimate/https://albertdirksen15.github.io/CodeTrainer/" alt="CodeTrainer live preview" width="850" />
+  </a>
+</p>
 
 ## About
 
