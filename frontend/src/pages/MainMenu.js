@@ -164,11 +164,12 @@ export default function MainMenu() {
           </div>
           <div className="screen-body">
             <aside className="screen-live-info">
-              <div className="live-info-title">LIVE INFO</div>
-              <div className="live-info-row"><span>STATUS</span><strong>{completed ? 'COMPLETE' : 'TYPING'}</strong></div>
-              <div className="live-info-row"><span>NEXT KEY</span><strong>{keyLabel(nextChar) || 'DONE'}</strong></div>
-              <div className="live-info-row"><span>PROGRESS</span><strong>{progress}%</strong></div>
-              <div className="live-info-row"><span>ERRORS</span><strong>{errors}/{maxErrors}</strong></div>
+              <div className="live-info-title">CODE EXPLAIN</div>
+              <div className="live-info-row"><strong>SELECT</strong><span>выбирает данные</span></div>
+              <div className="live-info-row"><strong>*</strong><span>все столбцы</span></div>
+              <div className="live-info-row"><strong>FROM</strong><span>указывает таблицу</span></div>
+              <div className="live-info-row"><strong>movies</strong><span>имя таблицы</span></div>
+              <div className="live-info-row"><strong>;</strong><span>конец SQL-инструкции</span></div>
             </aside>
             <div className="screen-content">
               <p className="screen-kicker">{lesson.definition}</p>
