@@ -70,7 +70,18 @@ const courseCatalog = [
   {
     ...mysqlCourse,
     concepts: mysqlConcepts,
-    lessons: [mysqlSelectLesson, mysqlWhereLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title, theory: exercise.id === 'mysql-select-001' ? 'SELECT — основная команда SQL для чтения данных из таблицы. После SELECT указывается, какие столбцы нужно получить. Символ * означает все столбцы. FROM указывает таблицу. Запрос SELECT * FROM movies; возвращает все столбцы и строки таблицы movies. Точка с запятой завершает SQL-инструкцию.' : 'WHERE используется для фильтрации строк. После WHERE записывается условие. year > 2000 означает оставить только строки, где значение year больше 2000. SELECT получает данные из movies, а WHERE ограничивает результат по году.' })))
+    lessons: [mysqlSelectLesson, mysqlWhereLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title, theory: exercise.id === 'mysql-select-001' ? {
+        title: 'SQL Урок 1: SELECT-запросы для начинающих',
+        sections: [
+          { type: 'text', text: 'Чтобы получить данные из базы SQL, мы пишем операторы SELECT (их называют запросами). Запрос указывает, какие данные нужны, где их искать и, при желании, как их преобразовать.\n\nПредставьте таблицу как тип сущности (например, «Собаки»): каждая строка — это отдельный экземпляр (мопс, бигль), а каждый столбец — общее свойство (цвет шерсти, длина хвоста).' },
+          { type: 'heading', text: 'Базовый запрос — конкретные столбцы:' },
+          { type: 'code', text: 'SELECT столбец, другой_столбец, … FROM моя_таблица;' },
+          { type: 'text', text: 'Возвращает двумерный набор строк и столбцов — по сути копию таблицы только с запрошенными столбцами.' },
+          { type: 'heading', text: 'Запрос — все столбцы:' },
+          { type: 'code', text: 'SELECT * FROM моя_таблица;' },
+          { type: 'text', text: 'Звёздочка (*) — сокращение для всех столбцов. Удобно для быстрого просмотра таблицы.' }
+        ]
+      } : 'WHERE используется для фильтрации строк. После WHERE записывается условие. year > 2000 означает оставить только строки, где значение year больше 2000. SELECT получает данные из movies, а WHERE ограничивает результат по году.' })))
   }
 ];
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -682,8 +693,16 @@ export default function MainMenu() {
                 <div className="lesson-theory">
                   <div className="lesson-theory-scroll">
                     <small>{course.title.toUpperCase()} // LECTURE {String(currentLessonIndex + 1).padStart(2,'0')}</small>
-                    <h2>{lesson.definition}</h2>
-                    <p>{lesson.theory || 'Теоретический материал для этого урока будет добавлен позже.'}</p>
+                    <h2>{typeof lesson.theory === 'object' ? lesson.theory.title : lesson.definition}</h2>
+                    {typeof lesson.theory === 'object' ? (
+                      <div className="theory-sections">
+                        {lesson.theory.sections.map((section, index) => (
+                          section.type === 'heading' ? <h3 key={index}>{section.text}</h3>
+                            : section.type === 'code' ? <pre key={index}><code>{section.text}</code></pre>
+                            : <p key={index}>{section.text}</p>
+                        ))}
+                      </div>
+                    ) : <p>{lesson.theory || 'Теоретический материал для этого урока будет добавлен позже.'}</p>}
                   </div>
                   <div className="lesson-theory-action"><button onClick={() => setLessonView('exercise')}>START EXERCISE →</button></div>
                 </div>
@@ -701,6 +720,7 @@ export default function MainMenu() {
                 </div>
               ) : (
                 <div className="screen-content" ref={lessonBodyRef}>
+                  <button className="exercise-back" onClick={() => setLessonView('theory')}>← THEORY</button>
                   <p className="screen-kicker">{lesson.definition}</p>
                   <div className="code-line">
                     <span className="typed">{inputText}</span>
