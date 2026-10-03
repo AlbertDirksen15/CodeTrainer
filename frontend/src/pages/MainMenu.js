@@ -70,7 +70,17 @@ const courseCatalog = [
   {
     ...mysqlCourse,
     concepts: mysqlConcepts,
-    lessons: [mysqlSelectLesson, mysqlWhereLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title, theory: exercise.id === 'mysql-select-001' ? {
+    lessons: [mysqlSelectLesson, mysqlWhereLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title,
+      steps: exercise.id === 'mysql-select-001' ? [
+        { id:'1.1', label:'SELECT ×3', code:'SELECT\nSELECT\nSELECT' },
+        { id:'1.2', label:'* ×3', code:'*\n*\n*' },
+        { id:'1.3', label:'FROM ×3', code:'FROM\nFROM\nFROM' },
+        { id:'1.4', label:'movies ×3', code:'movies\nmovies\nmovies' },
+        { id:'1.5', label:'SELECT *', code:'SELECT *' },
+        { id:'1.6', label:'SELECT * FROM', code:'SELECT * FROM' },
+        { id:'1.7', label:'FULL QUERY ×5', code:'SELECT * FROM movies;\nSELECT * FROM movies;\nSELECT * FROM movies;\nSELECT * FROM movies;\nSELECT * FROM movies;' }
+      ] : null,
+      theory: exercise.id === 'mysql-select-001' ? {
         translations: {
           ru: {
             title: 'SQL Урок 1: SELECT — получаем данные',
@@ -378,6 +388,7 @@ export default function MainMenu() {
   const [testInput, setTestInput] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [lessonView, setLessonView] = useState('theory');
+  const [lessonStepIndex, setLessonStepIndex] = useState(0);
   const [theoryLanguage, setTheoryLanguage] = useState(() => localStorage.getItem('ct-theory-language') || 'ru');
   const [isPaused, setIsPaused] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
@@ -395,11 +406,13 @@ export default function MainMenu() {
   const course = courseCatalog.find((item) => item.id === selectedCourseId) || courseCatalog[1];
   const lessons = course.lessons;
   const lesson = lessons[currentLessonIndex] || lessons[0];
-  const targetCommand = lesson.code;
+  const lessonSteps = lesson.steps || [];
+  const lessonStep = lessonSteps[lessonStepIndex] || null;
+  const targetCommand = lessonStep ? lessonStep.code : lesson.code;
   const nextChar = targetCommand[inputText.length] || '';
   const maxErrors = Math.max(1, Math.ceil(targetCommand.length * 0.03));
   const progress = Math.round((inputText.length / targetCommand.length) * 100);
-  const progressKey = `ct-progress:${course.id}:${lesson.id}`;
+  const progressKey = lessonStep ? `ct-progress:${course.id}:${lesson.id}:step:${lessonStep.id}` : `ct-progress:${course.id}:${lesson.id}`;
   const savedLesson = JSON.parse(localStorage.getItem(progressKey) || '{}');
   const conceptMap = Object.fromEntries((course.concepts || []).map((concept) => [concept.id, concept]));
   let partOffset = 0;
@@ -463,6 +476,7 @@ export default function MainMenu() {
     setErrors(0);
     setCompleted(false);
     setLessonView('theory');
+    setLessonStepIndex(0);
     setCourseMenuId(null);
     setMenuOpen(false);
   };
@@ -559,12 +573,17 @@ export default function MainMenu() {
         const next = inputText + acceptedChar;
         setInputText(next);
         if (next === targetCommand) {
-          localStorage.setItem(progressKey, JSON.stringify({
-            completed: true,
-            errors,
-            completedAt: new Date().toISOString()
-          }));
-          setCompleted(true);
+          localStorage.setItem(progressKey, JSON.stringify({ completed: true, errors, completedAt: new Date().toISOString() }));
+          if (lessonStep && lessonStepIndex < lessonSteps.length - 1) {
+            window.setTimeout(() => {
+              setLessonStepIndex((value) => value + 1);
+              setInputText('');
+              setErrors(0);
+            }, 350);
+          } else {
+            if (lessonStep) localStorage.setItem(`ct-progress:${course.id}:${lesson.id}`, JSON.stringify({ completed:true, errors, completedAt:new Date().toISOString() }));
+            setCompleted(true);
+          }
         }
       } else {
         setErrors((value) => value + 1);
@@ -576,7 +595,7 @@ export default function MainMenu() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck, menuOpen, testInput, progressKey, errors]);
+  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck, menuOpen, testInput, progressKey, errors, lessonStep, lessonStepIndex, lessonSteps.length, course.id, lesson.id]);
 
   const restartLesson = () => {
     setInputText('');
@@ -592,6 +611,7 @@ export default function MainMenu() {
       setErrors(0);
       setCompleted(false);
       setLessonView('theory');
+      setLessonStepIndex(0);
     }
   };
 
@@ -758,7 +778,22 @@ export default function MainMenu() {
                       </> : <><h2>{lesson.definition}</h2><p>{theory || 'Теоретический материал для этого урока будет добавлен позже.'}</p></>;
                     })()}
                   </div>
-                  <div className="lesson-theory-action"><button onClick={() => setLessonView('exercise')}>START EXERCISE →</button></div>
+                  <div className="lesson-theory-action">
+                    {lessonSteps.length > 0 && <div className="lesson-step-list">
+                      {lessonSteps.map((step, index) => {
+                        const done = JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${step.id}`) || '{}').completed;
+                        const previousDone = index === 0 || JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${lessonSteps[index - 1].id}`) || '{}').completed;
+                        return <button key={step.id} disabled={!previousDone} className={done ? 'done' : ''} onClick={() => { if (previousDone) { setLessonStepIndex(index); setInputText(''); setErrors(0); setCompleted(false); setLessonView('exercise'); } }}><b>{step.id}</b> {step.label}{done ? ' ✓' : ''}</button>;
+                      })}
+                    </div>}
+                    <button onClick={() => {
+                      if (lessonSteps.length) {
+                        const firstOpen = lessonSteps.findIndex((step, index) => !JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${step.id}`) || '{}').completed && (index === 0 || JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${lessonSteps[index - 1].id}`) || '{}').completed);
+                        setLessonStepIndex(firstOpen >= 0 ? firstOpen : lessonSteps.length - 1);
+                      }
+                      setInputText(''); setErrors(0); setCompleted(false); setLessonView('exercise');
+                    }}>START EXERCISE →</button>
+                  </div>
                 </div>
               ) : completed ? (
                 <div className="lesson-complete">
@@ -775,7 +810,7 @@ export default function MainMenu() {
               ) : (
                 <div className="screen-content" ref={lessonBodyRef}>
                   <button className="exercise-back" onClick={() => setLessonView('theory')}>← THEORY</button>
-                  <p className="screen-kicker">{lesson.definition}</p>
+                  <p className="screen-kicker">{lessonStep ? `STEP ${lessonStep.id} // ${lessonStep.label}` : lesson.definition}</p>
                   <div className="code-line">
                     <span className="typed">{inputText}</span>
                     <span className="current-char" ref={currentCharRef}>{nextChar === '\n' ? '↵' : nextChar || ' '}</span>
