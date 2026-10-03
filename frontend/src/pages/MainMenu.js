@@ -1,5 +1,13 @@
 import '../index.css';
-import lessons from '../data/lessons.json';
+import mysqlCourse from '../data/courses/mysql/course.json';
+import mysqlSelectLesson from '../data/courses/mysql/lessons/001-select.json';
+
+const courseCatalog = [
+  {
+    ...mysqlCourse,
+    lessons: [mysqlSelectLesson]
+  }
+];
 import React, { useEffect, useMemo, useState } from 'react';
 
 const keyboardLayout = [
@@ -49,6 +57,7 @@ const physicalKeyForChar = (char) => {
 };
 
 export default function MainMenu() {
+  const [selectedCourseId, setSelectedCourseId] = useState(() => localStorage.getItem('ct-course') || courseCatalog[0].id);
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [inputText, setInputText] = useState('');
   const [isEnglishLayout, setIsEnglishLayout] = useState(null);
@@ -58,8 +67,16 @@ export default function MainMenu() {
   const [isPaused, setIsPaused] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
 
-  const lesson = lessons[currentLessonIndex];
-  const targetCommand = lesson.text;
+  const course = courseCatalog.find((item) => item.id === selectedCourseId) || courseCatalog[0];
+  const lessons = course.lessons.flatMap((lessonFile) =>
+    lessonFile.exercises.map((exercise) => ({
+      ...exercise,
+      lessonId: lessonFile.id,
+      definition: exercise.title
+    }))
+  );
+  const lesson = lessons[currentLessonIndex] || lessons[0];
+  const targetCommand = lesson.code;
   const nextChar = targetCommand[inputText.length] || '';
   const maxErrors = Math.max(1, Math.ceil(targetCommand.length * 0.03));
   const progress = Math.round((inputText.length / targetCommand.length) * 100);
@@ -72,6 +89,32 @@ export default function MainMenu() {
   useEffect(() => {
     localStorage.setItem('ct-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('ct-course', selectedCourseId);
+  }, [selectedCourseId]);
+
+  const progressKey = `ct-progress:${course.id}:${lesson.id}`;
+  const savedLesson = JSON.parse(localStorage.getItem(progressKey) || '{}');
+
+  useEffect(() => {
+    if (completed) {
+      localStorage.setItem(progressKey, JSON.stringify({
+        completed: true,
+        errors,
+        completedAt: new Date().toISOString()
+      }));
+    }
+  }, [completed, errors, progressKey]);
+
+  const selectCourse = (event) => {
+    setSelectedCourseId(event.target.value);
+    setCurrentLessonIndex(0);
+    setInputText('');
+    setErrors(0);
+    setCompleted(false);
+    setIsPaused(false);
+  };
 
   useEffect(() => {
     localStorage.setItem('ct-layout-check', layoutCheck ? 'on' : 'off');
@@ -183,7 +226,14 @@ export default function MainMenu() {
               {theme === 'light' ? 'DARK' : 'LIGHT'}
             </button>
           </div>
+          <label className="course-select">
+            <span>COURSE</span>
+            <select value={course.id} onChange={selectCourse}>
+              {courseCatalog.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
+            </select>
+          </label>
           <div className="stat"><span>USER</span><strong>LOCAL</strong></div>
+          <div className="stat"><span>SAVED</span><strong>{savedLesson.completed ? 'COMPLETE' : 'NOT YET'}</strong></div>
           <div className="stat"><span>LESSON</span><strong>{currentLessonIndex + 1}/{lessons.length}</strong></div>
           <div className="stat"><span>ERRORS</span><strong>{errors}/{maxErrors}</strong></div>
           <div className="stat"><span>CHARS</span><strong>{inputText.length}/{targetCommand.length}</strong></div>
