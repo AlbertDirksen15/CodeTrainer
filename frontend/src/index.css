@@ -19,8 +19,8 @@ button { font: inherit; }
   --bg:#171a18; --case:#2a2e29; --case2:#111411; --ink:#e2e8dd; --muted:#929b91;
   --key:#343a34; --key-edge:#555e55; --screen:#020604; --green:#70ff8c;
 }
-.workspace { width:min(1813px,calc(100vw - 24px)); max-width:none; margin:0 auto; display:grid; grid-template-columns:minmax(220px,297px) minmax(0,1187px) minmax(220px,297px); gap:16px; align-items:stretch; }
-.screen-shell { min-height:clamp(280px,40vh,480px); border:10px solid var(--case2); outline:2px solid rgba(0,0,0,.3); border-radius:8px; background:var(--screen); color:var(--green); box-shadow:inset 0 0 45px rgba(78,255,116,.09),0 10px 25px rgba(0,0,0,.16); display:grid; grid-template-rows:auto 1fr auto; overflow:hidden; }
+.workspace { max-width:1500px; margin:0 auto; display:grid; grid-template-columns:minmax(0,4fr) minmax(220px,1fr); gap:16px; }
+.screen-shell { min-height:clamp(300px,47vh,560px); border:10px solid var(--case2); outline:2px solid rgba(0,0,0,.3); border-radius:8px; background:var(--screen); color:var(--green); box-shadow:inset 0 0 45px rgba(78,255,116,.09),0 10px 25px rgba(0,0,0,.16); display:grid; grid-template-rows:auto 1fr auto; overflow:hidden; }
 .screen-top-actions { display:flex; align-items:center; gap:12px; }
 .hamburger { border:1px solid var(--green-dim); background:transparent; color:var(--green); padding:2px 7px; cursor:pointer; font-size:18px; line-height:1; }
 .screen-topline,.screen-footer { display:flex; justify-content:space-between; gap:12px; padding:10px 16px; border-bottom:1px solid var(--green-dim); font-size:12px; letter-spacing:.12em; }
@@ -137,3 +137,10 @@ button { font: inherit; }
 .screen-course small { color:#5d8c68; }
 .screen-course em { font-style:normal; white-space:nowrap; font-size:11px; }
 .screen-back { padding:4px 8px; font-size:10px; letter-spacing:.08em; }
+
+.screen-main { min-height:0; display:grid; grid-template-columns:minmax(210px,24%) minmax(0,1fr); overflow:hidden; }
+.lesson-pane { min-width:0; min-height:0; display:grid; grid-template-rows:1fr auto; overflow:hidden; }
+.screen-main .explain-panel { min-height:0; height:auto; border:0; border-right:1px solid var(--green-dim); outline:0; border-radius:0; box-shadow:none; background:rgba(0,0,0,.08); }
+.screen-main .explain-panel::after { display:none; }
+.screen-main .explain-list { overflow:auto; }
+.screen-main .screen-content { min-height:0; }
