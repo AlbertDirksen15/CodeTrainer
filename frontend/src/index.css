@@ -813,12 +813,7 @@ button { font: inherit; }
   letter-spacing:.02em;
 }
 
-/* Lecture controls: bottom-right inside the green screen. */
-.lesson-theory-action {
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-}
+/* Lecture step buttons on the right; START EXERCISE keeps its original position. */
 .lesson-step-list {
   justify-content:flex-end;
 }
