@@ -71,16 +71,62 @@ const courseCatalog = [
     ...mysqlCourse,
     concepts: mysqlConcepts,
     lessons: [mysqlSelectLesson, mysqlWhereLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title, theory: exercise.id === 'mysql-select-001' ? {
-        title: 'SQL Урок 1: SELECT-запросы для начинающих',
-        sections: [
-          { type: 'text', text: 'Чтобы получить данные из базы SQL, мы пишем операторы SELECT (их называют запросами). Запрос указывает, какие данные нужны, где их искать и, при желании, как их преобразовать.\n\nПредставьте таблицу как тип сущности (например, «Собаки»): каждая строка — это отдельный экземпляр (мопс, бигль), а каждый столбец — общее свойство (цвет шерсти, длина хвоста).' },
-          { type: 'heading', text: 'Базовый запрос — конкретные столбцы:' },
-          { type: 'code', text: 'SELECT столбец, другой_столбец, … FROM моя_таблица;' },
-          { type: 'text', text: 'Возвращает двумерный набор строк и столбцов — по сути копию таблицы только с запрошенными столбцами.' },
-          { type: 'heading', text: 'Запрос — все столбцы:' },
-          { type: 'code', text: 'SELECT * FROM моя_таблица;' },
-          { type: 'text', text: 'Звёздочка (*) — сокращение для всех столбцов. Удобно для быстрого просмотра таблицы.' }
-        ]
+        translations: {
+          ru: {
+            title: 'SQL Урок 1: SELECT-запросы',
+            sections: [
+              { type:'heading', text:'Что такое SELECT-запрос.' },
+              { type:'text', text:'Чтобы получить данные из базы данных, мы пишем запрос с помощью команды SELECT. В нём мы указываем базе, какие данные нужны и откуда их взять. При желании можно также указать, как обработать эти данные.' },
+              { type:'heading', text:'Как устроена таблица.' },
+              { type:'text', text:'Представьте таблицу «Собаки»:\n\n• Таблица описывает один тип объектов — здесь это собаки.\n• Каждая строка — одна конкретная собака (мопс, бигль).\n• Каждый столбец — одно свойство, которое есть у каждой собаки (цвет шерсти, длина хвоста).' },
+              { type:'table', headers:['порода','цвет шерсти','длина хвоста'], rows:[['мопс','бежевый','короткий'],['бигль','пятнистый','средний']] },
+              { type:'heading', text:'Запрос с выбранными столбцами.' },
+              { type:'code', text:'SELECT столбец, другой_столбец\nFROM моя_таблица;' },
+              { type:'text', text:'Читается так: «выбрать эти столбцы из таблицы моя_таблица». В результате получаем ту же таблицу, но только с перечисленными столбцами. Остальные не показываются.' },
+              { type:'heading', text:'Запрос со всеми столбцами.' },
+              { type:'code', text:'SELECT *\nFROM моя_таблица;' },
+              { type:'text', text:'Звёздочка * означает «все столбцы». Это удобно, чтобы быстро посмотреть таблицу и увидеть, что в ней находится.' },
+              { type:'heading', text:'Коротко.' },
+              { type:'text', text:'• SELECT говорит, какие столбцы показать.\n• FROM говорит, из какой таблицы их взять.\n• * означает «показать всё».\n• Запрос заканчивается символом ;.' }
+            ]
+          },
+          en: {
+            title:'SQL Lesson 1: SELECT Queries',
+            sections:[
+              {type:'heading',text:'What is a SELECT query.'},
+              {type:'text',text:'To get data out of a database, you write a query using the SELECT command. In it, you tell the database which data you need and where to take it from. If you want, you can also specify how to process that data.'},
+              {type:'heading',text:'How a table works.'},
+              {type:'text',text:'Imagine a "Dogs" table:\n\n• The table describes one type of object, here it\'s dogs.\n• Each row is one specific dog (a pug, a beagle).\n• Each column is one property that every dog has (fur color, tail length).'},
+              {type:'table',headers:['breed','fur color','tail length'],rows:[['pug','beige','short'],['beagle','spotted','medium']]},
+              {type:'heading',text:'Query with chosen columns.'},
+              {type:'code',text:'SELECT column, another_column\nFROM mytable;'},
+              {type:'text',text:'It reads like this: "select these columns from the table mytable." You get back the same table, but with only the columns you listed. The rest are not shown.'},
+              {type:'heading',text:'Query with all columns.'},
+              {type:'code',text:'SELECT *\nFROM mytable;'},
+              {type:'text',text:'The asterisk * means "all columns." It\'s handy for quickly peeking into a table and seeing what\'s inside.'},
+              {type:'heading',text:'In short.'},
+              {type:'text',text:'• SELECT says which columns to show.\n• FROM says which table to take them from.\n• * means "show everything."\n• A query ends with ;.'}
+            ]
+          },
+          de: {
+            title:'SQL Lektion 1: SELECT-Abfragen',
+            sections:[
+              {type:'heading',text:'Was ist eine SELECT-Abfrage?'},
+              {type:'text',text:'Um Daten aus einer Datenbank abzurufen, schreibt man eine Abfrage mit dem Befehl SELECT. Darin gibt man an, welche Daten benötigt werden und aus welcher Tabelle sie stammen. Bei Bedarf kann man auch festlegen, wie diese Daten verarbeitet werden sollen.'},
+              {type:'heading',text:'Wie eine Tabelle aufgebaut ist.'},
+              {type:'text',text:'Stellen Sie sich eine Tabelle „Hunde“ vor:\n\n• Die Tabelle beschreibt einen Objekttyp, hier Hunde.\n• Jede Zeile ist ein bestimmter Hund (Mops, Beagle).\n• Jede Spalte ist eine gemeinsame Eigenschaft (Fellfarbe, Schwanzlänge).'},
+              {type:'table',headers:['Rasse','Fellfarbe','Schwanzlänge'],rows:[['Mops','beige','kurz'],['Beagle','gefleckt','mittel']]},
+              {type:'heading',text:'Abfrage mit ausgewählten Spalten.'},
+              {type:'code',text:'SELECT spalte, andere_spalte\nFROM meine_tabelle;'},
+              {type:'text',text:'Das bedeutet: „Wähle diese Spalten aus der Tabelle meine_tabelle aus.“ Zurückgegeben wird die Tabelle nur mit den aufgelisteten Spalten. Die übrigen werden nicht angezeigt.'},
+              {type:'heading',text:'Abfrage mit allen Spalten.'},
+              {type:'code',text:'SELECT *\nFROM meine_tabelle;'},
+              {type:'text',text:'Das Sternchen * bedeutet „alle Spalten“. Es ist praktisch, um schnell in eine Tabelle zu schauen und ihren Inhalt zu sehen.'},
+              {type:'heading',text:'Kurz gesagt.'},
+              {type:'text',text:'• SELECT bestimmt, welche Spalten angezeigt werden.\n• FROM bestimmt, aus welcher Tabelle sie stammen.\n• * bedeutet „alles anzeigen“.\n• Eine Abfrage endet mit ;.'}
+            ]
+          }
+        }
       } : 'WHERE используется для фильтрации строк. После WHERE записывается условие. year > 2000 означает оставить только строки, где значение year больше 2000. SELECT получает данные из movies, а WHERE ограничивает результат по году.' })))
   }
 ];
@@ -332,6 +378,7 @@ export default function MainMenu() {
   const [testInput, setTestInput] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [lessonView, setLessonView] = useState('theory');
+  const [theoryLanguage, setTheoryLanguage] = useState(() => localStorage.getItem('ct-theory-language') || 'ru');
   const [isPaused, setIsPaused] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -693,16 +740,23 @@ export default function MainMenu() {
                 <div className="lesson-theory">
                   <div className="lesson-theory-scroll">
                     <small>{course.title.toUpperCase()} // LECTURE {String(currentLessonIndex + 1).padStart(2,'0')}</small>
-                    <h2>{typeof lesson.theory === 'object' ? lesson.theory.title : lesson.definition}</h2>
-                    {typeof lesson.theory === 'object' ? (
-                      <div className="theory-sections">
-                        {lesson.theory.sections.map((section, index) => (
-                          section.type === 'heading' ? <h3 key={index}>{section.text}</h3>
-                            : section.type === 'code' ? <pre key={index}><code>{section.text}</code></pre>
-                            : <p key={index}>{section.text}</p>
-                        ))}
+                    {typeof lesson.theory === 'object' && lesson.theory.translations && (
+                      <div className="theory-language">
+                        {['ru','en','de'].map((lang) => <button key={lang} className={theoryLanguage === lang ? 'active' : ''} onClick={() => { setTheoryLanguage(lang); localStorage.setItem('ct-theory-language', lang); }}>{lang.toUpperCase()}</button>)}
                       </div>
-                    ) : <p>{lesson.theory || 'Теоретический материал для этого урока будет добавлен позже.'}</p>}
+                    )}
+                    {(() => {
+                      const theory = typeof lesson.theory === 'object' && lesson.theory.translations ? (lesson.theory.translations[theoryLanguage] || lesson.theory.translations.ru) : lesson.theory;
+                      return typeof theory === 'object' ? <>
+                        <h2>{theory.title}</h2>
+                        <div className="theory-sections">{theory.sections.map((section,index) =>
+                          section.type === 'heading' ? <h3 key={index}>{section.text}</h3>
+                          : section.type === 'code' ? <pre key={index}><code>{section.text}</code></pre>
+                          : section.type === 'table' ? <table className="theory-table" key={index}><thead><tr>{section.headers.map((cell,i)=><th key={i}>{cell}</th>)}</tr></thead><tbody>{section.rows.map((row,r)=><tr key={r}>{row.map((cell,c)=><td key={c}>{cell}</td>)}</tr>)}</tbody></table>
+                          : <p key={index}>{section.text}</p>
+                        )}</div>
+                      </> : <><h2>{lesson.definition}</h2><p>{theory || 'Теоретический материал для этого урока будет добавлен позже.'}</p></>;
+                    })()}
                   </div>
                   <div className="lesson-theory-action"><button onClick={() => setLessonView('exercise')}>START EXERCISE →</button></div>
                 </div>
