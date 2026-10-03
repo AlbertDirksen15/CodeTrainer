@@ -72,13 +72,13 @@ const courseCatalog = [
     concepts: mysqlConcepts,
     lessons: [mysqlSelectLesson, mysqlWhereLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title,
       steps: exercise.id === 'mysql-select-001' ? [
-        { id:'1.1', label:'SELECT ×3', code:'SELECT\nSELECT\nSELECT' },
-        { id:'1.2', label:'* ×3', code:'*\n*\n*' },
-        { id:'1.3', label:'FROM ×3', code:'FROM\nFROM\nFROM' },
-        { id:'1.4', label:'movies ×3', code:'movies\nmovies\nmovies' },
+        { id:'1.1', label:'SELECT ×3', code:'SELECT\\nSELECT\\nSELECT' },
+        { id:'1.2', label:'* ×3', code:'*\\n*\\n*' },
+        { id:'1.3', label:'FROM ×3', code:'FROM\\nFROM\\nFROM' },
+        { id:'1.4', label:'movies ×3', code:'movies\\nmovies\\nmovies' },
         { id:'1.5', label:'SELECT *', code:'SELECT *' },
         { id:'1.6', label:'SELECT * FROM', code:'SELECT * FROM' },
-        { id:'1.7', label:'FULL QUERY ×5', code:'SELECT * FROM movies;\nSELECT * FROM movies;\nSELECT * FROM movies;\nSELECT * FROM movies;\nSELECT * FROM movies;' }
+        { id:'1.7', label:'FULL QUERY ×5', code:'SELECT * FROM movies;\\nSELECT * FROM movies;\\nSELECT * FROM movies;\\nSELECT * FROM movies;\\nSELECT * FROM movies;' }
       ] : null,
       theory: exercise.id === 'mysql-select-001' ? {
         translations: {
