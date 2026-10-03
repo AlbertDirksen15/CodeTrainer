@@ -18,14 +18,18 @@
           "id": "select-basics",
           "title": "SELECT: основы",
           "type": "topic",
-          "exercises": ["mysql-select-001"],
+          "exercises": [
+            "mysql-select-001"
+          ],
           "children": []
         },
         {
           "id": "filtering",
           "title": "WHERE и фильтрация",
           "type": "topic",
-          "exercises": [],
+          "exercises": [
+            "mysql-where-001"
+          ],
           "children": []
         },
         {
@@ -43,7 +47,13 @@
       "type": "section",
       "exercises": [],
       "children": [
-        {"id":"joins","title":"JOIN","type":"topic","exercises":[],"children":[]}
+        {
+          "id": "joins",
+          "title": "JOIN",
+          "type": "topic",
+          "exercises": [],
+          "children": []
+        }
       ]
     },
     {
@@ -66,7 +76,13 @@
       "type": "section",
       "exercises": [],
       "children": [
-        {"id":"mysql-specific","title":"Особенности MySQL","type":"topic","exercises":[],"children":[]}
+        {
+          "id": "mysql-specific",
+          "title": "Особенности MySQL",
+          "type": "topic",
+          "exercises": [],
+          "children": []
+        }
       ]
     }
   ]
