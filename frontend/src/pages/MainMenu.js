@@ -129,6 +129,104 @@ const startCyberAmbient = async () => {
   };
 };
 
+const startCyberTrack = async () => {
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+  const ctx = new Ctx();
+  if (ctx.state === 'suspended') await ctx.resume();
+
+  const master = ctx.createGain();
+  const musicBus = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+  master.gain.value = 0.16;
+  musicBus.gain.value = 0.72;
+  filter.type = 'lowpass';
+  filter.frequency.value = 2200;
+  filter.Q.value = 0.8;
+  musicBus.connect(filter);
+  filter.connect(master);
+  master.connect(ctx.destination);
+
+  const tempo = 92;
+  const beat = 60 / tempo;
+  const bass = [55,55,65.41,55,73.42,73.42,49,49];
+  const lead = [220,261.63,293.66,329.63,293.66,261.63,196,220];
+  const chords = [[110,130.81,164.81],[130.81,164.81,196],[146.83,174.61,220],[98,123.47,146.83]];
+  let step = 0;
+
+  const tone = (freq, type, start, duration, volume, destination = musicBus) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(volume, start + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+    osc.connect(gain);
+    gain.connect(destination);
+    osc.start(start);
+    osc.stop(start + duration + 0.03);
+  };
+
+  const kick = (start) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(135, start);
+    osc.frequency.exponentialRampToValueAtTime(42, start + 0.16);
+    gain.gain.setValueAtTime(0.34, start);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(start);
+    osc.stop(start + 0.24);
+  };
+
+  const hat = (start) => {
+    const length = Math.floor(ctx.sampleRate * 0.045);
+    const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < length; i += 1) data[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    const hp = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+    hp.type = 'highpass';
+    hp.frequency.value = 5200;
+    gain.gain.setValueAtTime(0.055, start);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.045);
+    src.buffer = buffer;
+    src.connect(hp);
+    hp.connect(gain);
+    gain.connect(master);
+    src.start(start);
+  };
+
+  const sequence = () => {
+    if (ctx.state === 'closed') return;
+    const now = ctx.currentTime + 0.025;
+    if (step % 2 === 0) kick(now);
+    hat(now + beat / 2);
+    tone(bass[step % bass.length], 'sawtooth', now, beat * 0.7, 0.12);
+    if (step % 4 === 0) {
+      chords[Math.floor(step / 4) % chords.length].forEach((freq) =>
+        tone(freq, 'triangle', now, beat * 3.7, 0.035)
+      );
+    }
+    if (step % 2 === 1) tone(lead[step % lead.length], 'square', now, beat * 0.38, 0.032);
+    step = (step + 1) % 16;
+  };
+
+  sequence();
+  const timer = window.setInterval(sequence, beat * 1000);
+  return () => {
+    window.clearInterval(timer);
+    try {
+      master.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.04);
+      window.setTimeout(() => ctx.close(), 180);
+    } catch {}
+  };
+};
+
 export default function MainMenu() {
   const [selectedCourseId, setSelectedCourseId] = useState(() => localStorage.getItem('ct-course') || 'mysql');
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
@@ -142,6 +240,7 @@ export default function MainMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuSection, setMenuSection] = useState('COURSES');
   const [musicOn, setMusicOn] = useState(false);
+  const [musicMode, setMusicMode] = useState(() => localStorage.getItem('ct-music-mode') || 'ambient');
   const musicStopRef = useRef(null);
 
   const course = courseCatalog.find((item) => item.id === selectedCourseId) || courseCatalog[1];
@@ -201,7 +300,7 @@ export default function MainMenu() {
       return;
     }
     try {
-      const stopMusic = await startCyberAmbient();
+      const stopMusic = await (musicMode === 'track' ? startCyberTrack() : startCyberAmbient());
       if (stopMusic) {
         musicStopRef.current = stopMusic;
         setMusicOn(true);
@@ -210,6 +309,20 @@ export default function MainMenu() {
     } catch {
       setMusicOn(false);
       localStorage.setItem('ct-music', 'off');
+    }
+  };
+
+  const selectMusicMode = async (mode) => {
+    if (mode === musicMode) return;
+    localStorage.setItem('ct-music-mode', mode);
+    setMusicMode(mode);
+    if (!musicOn) return;
+    if (musicStopRef.current) musicStopRef.current();
+    try {
+      musicStopRef.current = await (mode === 'track' ? startCyberTrack() : startCyberAmbient());
+    } catch {
+      musicStopRef.current = null;
+      setMusicOn(false);
     }
   };
 
@@ -357,8 +470,12 @@ export default function MainMenu() {
                       <span>LAYOUT CHECK // {layoutCheck ? 'ON' : 'OFF'}</span>
                       <small>THEME // {theme.toUpperCase()}</small>
                       <div className="music-setting">
-                        <span>CYBER AMBIENT // {musicOn ? 'ON' : 'OFF'}</span>
+                        <span>MUSIC // {musicOn ? 'ON' : 'OFF'}</span>
                         <button onClick={toggleMusic}>{musicOn ? 'MUSIC OFF' : 'MUSIC ON'}</button>
+                      </div>
+                      <div className="music-modes">
+                        <button className={musicMode === 'ambient' ? 'active' : ''} onClick={() => selectMusicMode('ambient')}>AMBIENT</button>
+                        <button className={musicMode === 'track' ? 'active' : ''} onClick={() => selectMusicMode('track')}>CYBER TRACK</button>
                       </div>
                     </>}
                   </div>
