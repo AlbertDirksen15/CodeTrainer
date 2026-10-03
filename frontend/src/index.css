@@ -80,3 +80,10 @@ button { font: inherit; }
 .screen-body { display:grid; grid-template-columns:minmax(190px,1fr) minmax(0,4fr); gap:0; min-height:0; overflow:hidden; }
 .explain-terminal { min-width:0; min-height:0; border:0; border-right:1px solid var(--green-dim); overflow:hidden; }
 .lesson-terminal { min-width:0; min-height:0; border:0; overflow:hidden; }
+
+/* Original vertical spacing */
+.trainer { padding:clamp(12px,2vw,28px); }
+.keyboard-deck { margin-top:18px; }
+.trainer-footer { margin-top:10px; }
+.screen-body { gap:0 !important; padding:0 !important; }
+@media (max-width:900px) { .trainer { padding:10px; } }
