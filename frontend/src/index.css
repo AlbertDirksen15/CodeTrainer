@@ -706,3 +706,40 @@ button { font: inherit; }
 .lesson-theory-action button:hover {
   background:rgba(113,255,141,.08);
 }
+
+
+/* Theory content formatting and exercise back control — green screen only. */
+.theory-sections { max-width:820px; }
+.theory-sections h3 {
+  margin:22px 0 8px;
+  color:var(--green);
+  font-size:14px;
+}
+.theory-sections pre {
+  margin:8px 0 14px;
+  padding:10px 12px;
+  border-left:2px solid var(--green-dim);
+  background:rgba(113,255,141,.05);
+  color:var(--green);
+  font:inherit;
+  font-size:13px;
+  line-height:1.5;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.exercise-back {
+  align-self:flex-start;
+  margin:0 0 14px;
+  padding:5px 8px;
+  border:1px solid var(--green-dim);
+  background:transparent;
+  color:#8ab895;
+  font:inherit;
+  font-size:10px;
+  letter-spacing:.08em;
+  cursor:pointer;
+}
+.exercise-back:hover {
+  color:var(--green);
+  background:rgba(113,255,141,.08);
+}
