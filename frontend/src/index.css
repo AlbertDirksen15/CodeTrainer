@@ -88,32 +88,33 @@ button { font: inherit; }
 .screen-body { gap:0 !important; padding:0 !important; }
 @media (max-width:900px) { .trainer { padding:10px; } }
 
-/* Vertical fit: preserve normal desktop geometry, compact only when viewport height is limited. */
-@media (min-width:901px) and (max-height:950px) {
-  .trainer { padding-top:10px; padding-bottom:10px; }
-  .screen-shell { min-height:clamp(250px,34vh,320px); }
-  .info-panel { padding:10px 14px; }
-  .panel-heading { padding-bottom:7px; margin-bottom:3px; }
-  .stat { padding:6px 0; }
-  .progress-track { margin:8px 0 9px; }
-  .layout-lamp { padding:6px 0; }
-  .panel-actions { margin-top:6px; }
-  .keyboard-deck { margin-top:10px; padding:10px 16px; }
-  .key-row { margin-bottom:5px; }
-  .key { height:clamp(38px,5.4vh,50px); }
-  .trainer-footer { margin-top:5px; }
-}
-@media (min-width:901px) and (max-height:760px) {
-  .trainer { padding-top:6px; padding-bottom:6px; }
-  .screen-shell { min-height:220px; }
-  .screen-topline,.screen-footer { padding-top:6px; padding-bottom:6px; }
-  .screen-content { padding-top:16px; padding-bottom:16px; }
-  .info-panel { padding-top:7px; padding-bottom:7px; }
-  .stat { padding:4px 0; }
-  .progress-track { margin:5px 0 6px; }
-  .layout-lamp { padding:4px 0; }
-  .keyboard-deck { margin-top:7px; padding-top:7px; padding-bottom:7px; }
-  .key-row { margin-bottom:3px; }
-  .key { height:38px; }
-  .trainer-footer { margin-top:3px; }
+/* Desktop: use the available viewport height instead of shrinking the whole UI. */
+@media (min-width:901px) {
+  .trainer {
+    height:100vh;
+    min-height:0;
+    display:grid;
+    grid-template-rows:minmax(0,1fr) auto auto;
+    row-gap:0;
+    overflow:hidden;
+  }
+  .workspace {
+    min-height:0;
+    height:100%;
+  }
+  .screen-shell {
+    height:100%;
+    min-height:0;
+  }
+  .info-panel {
+    height:100%;
+    min-height:0;
+    overflow:auto;
+  }
+  .keyboard-deck {
+    margin-top:10px;
+  }
+  .trainer-footer {
+    margin-top:6px;
+  }
 }
