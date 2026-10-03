@@ -110,3 +110,28 @@ button { font: inherit; }
   .trainer-footer { display:none; }
 }
 
+
+.explain-panel { min-height:100%; padding:18px; border:2px solid var(--key-edge); border-radius:6px; background:var(--case); box-shadow:4px 5px 0 rgba(0,0,0,.12); overflow:hidden; }
+.explain-list { display:grid; gap:7px; }
+.explain-item { display:grid; grid-template-columns:18px 1fr; gap:8px; padding:9px 5px; border-bottom:1px dashed var(--key-edge); }
+.explain-item div { display:grid; gap:3px; min-width:0; }
+.explain-item strong { font-size:13px; overflow-wrap:anywhere; }
+.explain-item small { color:var(--muted); line-height:1.3; }
+.explain-item.future { opacity:.42; }
+.explain-item.active { color:#166f2b; background:rgba(83,224,111,.1); }
+.theme-dark .explain-item.active { color:var(--green); }
+.explain-item.done { opacity:.68; }
+.screen-top-actions { display:flex; align-items:center; gap:12px; }
+.hamburger,.screen-back { border:1px solid var(--green-dim); background:transparent; color:var(--green); cursor:pointer; }
+.hamburger { width:30px; height:25px; padding:0; font-size:17px; line-height:1; }
+.hamburger:hover,.screen-back:hover { background:var(--green-dim); }
+.screen-menu { padding:22px; display:grid; grid-template-columns:minmax(100px,.65fr) minmax(0,2fr); gap:18px; overflow:auto; }
+.screen-menu-nav { display:flex; flex-direction:column; gap:14px; padding-right:16px; border-right:1px solid var(--green-dim); color:#4d8058; font-size:12px; letter-spacing:.1em; }
+.screen-menu-nav strong { color:var(--green); }
+.screen-course-list { display:grid; align-content:start; gap:10px; }
+.screen-course { display:flex; justify-content:space-between; gap:12px; width:100%; padding:13px; text-align:left; border:1px solid var(--green-dim); background:rgba(113,255,141,.025); color:#78ad84; cursor:pointer; }
+.screen-course.selected { color:var(--green); border-color:var(--green); box-shadow:inset 3px 0 0 var(--green); }
+.screen-course span { display:grid; gap:4px; }
+.screen-course small { color:#5d8c68; }
+.screen-course em { font-style:normal; white-space:nowrap; font-size:11px; }
+.screen-back { padding:4px 8px; font-size:10px; letter-spacing:.08em; }
