@@ -130,3 +130,11 @@ button { font: inherit; }
 .explain-line.future { opacity:.38; }
 .explain-line.done { opacity:.68; }
 .explain-line.active { opacity:1; background:rgba(113,255,141,.06); }
+
+.side-menu-tabs { min-height:0; padding:12px 10px; display:flex; flex-direction:column; gap:9px; overflow:auto; }
+.side-menu-tabs button { width:100%; padding:9px 8px; border:1px solid var(--green-dim); background:transparent; color:var(--green); font:inherit; font-size:10px; letter-spacing:.08em; text-align:left; cursor:pointer; }
+.side-menu-tabs button.active { background:var(--green); color:var(--screen); }
+.course-choice-list { display:grid; gap:9px; }
+.course-choice-list button { display:grid; gap:4px; padding:12px; border:1px solid var(--green-dim); background:transparent; color:var(--green); font:inherit; text-align:left; cursor:pointer; }
+.course-choice-list button.selected { background:rgba(113,255,141,.09); box-shadow:inset 3px 0 0 var(--green); }
+.course-choice-list button span { color:#8ab895; font-size:10px; }
