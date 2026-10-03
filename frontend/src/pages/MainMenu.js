@@ -1,5 +1,13 @@
 import '../index.css';
-import lessons from '../data/lessons.json';
+import mysqlCourse from '../data/courses/mysql/course.json';
+import mysqlConcepts from '../data/courses/mysql/concepts.json';
+import mysqlSelectLesson from '../data/courses/mysql/lessons/001-select.json';
+
+const course = { ...mysqlCourse, concepts: mysqlConcepts, lessonFiles: [mysqlSelectLesson] };
+const lessons = course.lessonFiles.flatMap((file) => file.exercises.map((exercise) => ({
+  ...exercise,
+  definition: exercise.title
+})));
 import React, { useEffect, useMemo, useState } from 'react';
 
 const keyboardLayout = [
@@ -57,12 +65,24 @@ export default function MainMenu() {
   const [completed, setCompleted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuSection, setMenuSection] = useState('COURSES');
 
   const lesson = lessons[currentLessonIndex];
-  const targetCommand = lesson.text;
+  const targetCommand = lesson.code;
   const nextChar = targetCommand[inputText.length] || '';
   const maxErrors = Math.max(1, Math.ceil(targetCommand.length * 0.03));
   const progress = Math.round((inputText.length / targetCommand.length) * 100);
+  const progressKey = `ct-progress:${course.id}:${lesson.id}`;
+  const savedLesson = JSON.parse(localStorage.getItem(progressKey) || '{}');
+  const conceptMap = Object.fromEntries(course.concepts.map((concept) => [concept.id, concept]));
+  let partOffset = 0;
+  const explainedParts = (lesson.parts || []).map((part) => {
+    const start = partOffset;
+    partOffset += part.text.length;
+    return { ...part, start, end: partOffset, concept: part.concept ? conceptMap[part.concept] : null };
+  }).filter((part) => part.concept);
+  const activePartIndex = explainedParts.findIndex((part) => inputText.length >= part.start && inputText.length < part.end);
   const nextKeys = useMemo(() => {
     const keys = [physicalKeyForChar(nextChar)];
     if (requiresShift(nextChar)) keys.push('Shift-Left');
@@ -76,6 +96,12 @@ export default function MainMenu() {
   useEffect(() => {
     localStorage.setItem('ct-layout-check', layoutCheck ? 'on' : 'off');
   }, [layoutCheck]);
+
+  useEffect(() => {
+    if (completed) {
+      localStorage.setItem(progressKey, JSON.stringify({ completed: true, errors, completedAt: new Date().toISOString() }));
+    }
+  }, [completed, errors, progressKey]);
 
   const playErrorSound = () => {
     try {
@@ -95,7 +121,7 @@ export default function MainMenu() {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (isPaused || completed) return;
+      if (menuOpen || isPaused || completed) return;
       if (['Shift','Control','Alt','CapsLock','Tab'].includes(event.key)) return;
 
       let typedChar = '';
@@ -127,7 +153,7 @@ export default function MainMenu() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck]);
+  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck, menuOpen]);
 
   const restartLesson = () => {
     setInputText('');
@@ -160,29 +186,52 @@ export default function MainMenu() {
         <div className="screen-shell">
           <div className="screen-topline">
             <span>LESSON {String(currentLessonIndex + 1).padStart(2,'0')}</span>
-            <span className="screen-status">● READY</span>
+            <div className="screen-top-actions">
+              <span className="screen-status">{menuOpen ? '● MENU' : '● READY'}</span>
+              <button className="hamburger" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle menu">{menuOpen ? '×' : '☰'}</button>
+            </div>
           </div>
           <div className="screen-body">
             <aside className="explain-terminal">
               <div className="explain-terminal-head">CODE EXPLAIN</div>
               <div className="explain-terminal-body">
-                <div className="explain-line active"><strong>▶ SELECT</strong><span>выбрать данные</span></div>
-                <div className="explain-line"><strong>· *</strong><span>все столбцы</span></div>
-                <div className="explain-line"><strong>· FROM</strong><span>указывает таблицу</span></div>
-                <div className="explain-line"><strong>· movies</strong><span>имя таблицы</span></div>
-                <div className="explain-line"><strong>· ;</strong><span>конец SQL-инструкции</span></div>
+                {explainedParts.map((part, index) => {
+                  const state = inputText.length >= part.end ? 'done' : index === activePartIndex ? 'active' : 'future';
+                  return (
+                    <div className={`explain-line ${state}`} key={`${part.start}-${part.text}`}>
+                      <strong>{state === 'done' ? '✓' : state === 'active' ? '▶' : '·'} {part.text}</strong>
+                      <span>{part.concept.explanation}</span>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="explain-terminal-foot">SYNTAX // MYSQL</div>
+              <div className="explain-terminal-foot">SYNTAX // {course.title.toUpperCase()}</div>
             </aside>
             <div className="lesson-terminal">
-              <div className="screen-content">
-                <p className="screen-kicker">{lesson.definition}</p>
-                <div className="code-line">
-                  <span className="typed">{inputText}</span>
-                  {!completed && <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>}
-                  <span className="remaining">{targetCommand.slice(inputText.length + (completed ? 0 : 1))}</span>
+              {menuOpen ? (
+                <div className="terminal-menu">
+                  <nav className="terminal-menu-tabs">
+                    {['COURSES','PROGRESS','SETTINGS'].map((section) => (
+                      <button key={section} className={menuSection === section ? 'active' : ''} onClick={() => setMenuSection(section)}>{section}</button>
+                    ))}
+                  </nav>
+                  <div className="terminal-menu-content">
+                    {menuSection === 'COURSES' && <><strong>{course.title}</strong><span>{course.description}</span><small>01 // {lesson.title}</small></>}
+                    {menuSection === 'PROGRESS' && <><strong>PROGRESS</strong><span>{savedLesson.completed ? 'LESSON 01 // COMPLETE' : 'LESSON 01 // NOT COMPLETE'}</span><small>{progress}% CURRENT</small></>}
+                    {menuSection === 'SETTINGS' && <><strong>SETTINGS</strong><span>LAYOUT CHECK // {layoutCheck ? 'ON' : 'OFF'}</span><small>THEME // {theme.toUpperCase()}</small></>}
+                  </div>
+                  <button className="screen-back" onClick={() => setMenuOpen(false)}>BACK TO LESSON</button>
                 </div>
-              </div>
+              ) : (
+                <div className="screen-content">
+                  <p className="screen-kicker">{lesson.definition}</p>
+                  <div className="code-line">
+                    <span className="typed">{inputText}</span>
+                    {!completed && <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>}
+                    <span className="remaining">{targetCommand.slice(inputText.length + (completed ? 0 : 1))}</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div className="screen-footer">
@@ -199,6 +248,7 @@ export default function MainMenu() {
             </button>
           </div>
           <div className="stat"><span>USER</span><strong>LOCAL</strong></div>
+          <div className="stat"><span>SAVED</span><strong>{savedLesson.completed ? 'COMPLETE' : 'NOT YET'}</strong></div>
           <div className="stat"><span>LESSON</span><strong>{currentLessonIndex + 1}/{lessons.length}</strong></div>
           <div className="stat"><span>ERRORS</span><strong>{errors}/{maxErrors}</strong></div>
           <div className="stat"><span>CHARS</span><strong>{inputText.length}/{targetCommand.length}</strong></div>
