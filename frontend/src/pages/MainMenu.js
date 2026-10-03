@@ -473,9 +473,10 @@ export default function MainMenu() {
                         <span>MUSIC // {musicOn ? 'ON' : 'OFF'}</span>
                         <button onClick={toggleMusic}>{musicOn ? 'MUSIC OFF' : 'MUSIC ON'}</button>
                       </div>
-                      <div className="music-modes">
-                        <button className={musicMode === 'ambient' ? 'active' : ''} onClick={() => selectMusicMode('ambient')}>AMBIENT</button>
-                        <button className={musicMode === 'track' ? 'active' : ''} onClick={() => selectMusicMode('track')}>CYBER TRACK</button>
+                      <div className="music-selector">
+                        <button onClick={() => selectMusicMode(musicMode === 'ambient' ? 'track' : 'ambient')} aria-label="Previous music mode">‹</button>
+                        <span>{musicMode === 'ambient' ? 'AMBIENT' : 'CYBER TRACK'}</span>
+                        <button onClick={() => selectMusicMode(musicMode === 'ambient' ? 'track' : 'ambient')} aria-label="Next music mode">›</button>
                       </div>
                     </>}
                   </div>
