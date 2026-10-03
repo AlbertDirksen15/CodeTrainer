@@ -19,7 +19,7 @@ const courseCatalog = [
     lessons: [mysqlSelectLesson, mysqlWhereLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title })))
   }
 ];
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 const keyboardLayout = [
   ['`','1','2','3','4','5','6','7','8','9','0','-','=','Backspace'],
@@ -67,6 +67,67 @@ const physicalKeyForChar = (char) => {
   return char || '';
 };
 
+const startCyberAmbient = () => {
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+
+  const ctx = new Ctx();
+  const master = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+  master.gain.value = 0.055;
+  filter.type = 'lowpass';
+  filter.frequency.value = 950;
+  filter.Q.value = 1.4;
+  filter.connect(master);
+  master.connect(ctx.destination);
+
+  const droneGain = ctx.createGain();
+  droneGain.gain.value = 0.16;
+  droneGain.connect(filter);
+  const droneA = ctx.createOscillator();
+  const droneB = ctx.createOscillator();
+  droneA.type = 'sawtooth';
+  droneB.type = 'triangle';
+  droneA.frequency.value = 55;
+  droneB.frequency.value = 82.41;
+  droneB.detune.value = -7;
+  droneA.connect(droneGain);
+  droneB.connect(droneGain);
+  droneA.start();
+  droneB.start();
+
+  const notes = [110, 130.81, 98, 146.83, 110, 164.81, 98, 130.81];
+  let step = 0;
+  const pulse = () => {
+    if (ctx.state === 'closed') return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = step % 4 === 3 ? 'square' : 'triangle';
+    osc.frequency.value = notes[step % notes.length];
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.025);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+    osc.connect(gain);
+    gain.connect(filter);
+    osc.start(now);
+    osc.stop(now + 0.45);
+    step += 1;
+  };
+  pulse();
+  const timer = window.setInterval(pulse, 620);
+
+  return () => {
+    window.clearInterval(timer);
+    try {
+      droneA.stop();
+      droneB.stop();
+      master.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.04);
+      window.setTimeout(() => ctx.close(), 180);
+    } catch {}
+  };
+};
+
 export default function MainMenu() {
   const [selectedCourseId, setSelectedCourseId] = useState(() => localStorage.getItem('ct-course') || 'mysql');
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
@@ -79,6 +140,8 @@ export default function MainMenu() {
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuSection, setMenuSection] = useState('COURSES');
+  const [musicOn, setMusicOn] = useState(false);
+  const musicStopRef = useRef(null);
 
   const course = courseCatalog.find((item) => item.id === selectedCourseId) || courseCatalog[1];
   const lessons = course.lessons;
@@ -123,6 +186,25 @@ export default function MainMenu() {
   useEffect(() => {
     localStorage.setItem('ct-layout-check', layoutCheck ? 'on' : 'off');
   }, [layoutCheck]);
+
+  useEffect(() => () => {
+    if (musicStopRef.current) musicStopRef.current();
+  }, []);
+
+  const toggleMusic = () => {
+    if (musicOn) {
+      if (musicStopRef.current) musicStopRef.current();
+      musicStopRef.current = null;
+      setMusicOn(false);
+      localStorage.setItem('ct-music', 'off');
+      return;
+    }
+    musicStopRef.current = startCyberAmbient();
+    if (musicStopRef.current) {
+      setMusicOn(true);
+      localStorage.setItem('ct-music', 'on');
+    }
+  };
 
   useEffect(() => {
     if (completed) {
@@ -263,7 +345,15 @@ export default function MainMenu() {
                       </div>
                     </>}
                     {menuSection === 'PROGRESS' && <><strong>PROGRESS // {course.title}</strong><span>{savedLesson.completed || completed ? `LESSON ${String(currentLessonIndex + 1).padStart(2,'0')} // COMPLETE` : `LESSON ${String(currentLessonIndex + 1).padStart(2,'0')} // NOT COMPLETE`}</span><small>{progress}% CURRENT</small></>}
-                    {menuSection === 'SETTINGS' && <><strong>SETTINGS</strong><span>LAYOUT CHECK // {layoutCheck ? 'ON' : 'OFF'}</span><small>THEME // {theme.toUpperCase()}</small></>}
+                    {menuSection === 'SETTINGS' && <>
+                      <strong>SETTINGS</strong>
+                      <span>LAYOUT CHECK // {layoutCheck ? 'ON' : 'OFF'}</span>
+                      <small>THEME // {theme.toUpperCase()}</small>
+                      <div className="music-setting">
+                        <span>CYBER AMBIENT // {musicOn ? 'ON' : 'OFF'}</span>
+                        <button onClick={toggleMusic}>{musicOn ? 'MUSIC OFF' : 'MUSIC ON'}</button>
+                      </div>
+                    </>}
                   </div>
                   <button className="screen-back" onClick={() => setMenuOpen(false)}>BACK TO LESSON</button>
                 </div>
