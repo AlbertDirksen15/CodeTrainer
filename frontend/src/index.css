@@ -167,3 +167,111 @@ button { font: inherit; }
 .explain-terminal-foot {
   padding:2px 12px 8px;
 }
+
+/* Terminal menu — internal green-screen styling only */
+.side-menu-tabs {
+  min-height:0;
+  padding:12px 10px;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:6px;
+  overflow:hidden;
+}
+.side-menu-tabs button {
+  width:100%;
+  padding:8px 10px;
+  border:1px solid transparent;
+  background:transparent;
+  color:#8ab895;
+  font:inherit;
+  font-size:11px;
+  letter-spacing:.08em;
+  text-align:left;
+  cursor:pointer;
+}
+.side-menu-tabs button::before {
+  content:"· ";
+}
+.side-menu-tabs button:hover {
+  color:var(--green);
+  border-color:var(--green-dim);
+}
+.side-menu-tabs button.active {
+  color:var(--green);
+  border-color:var(--green-dim);
+  background:rgba(113,255,141,.07);
+}
+.side-menu-tabs button.active::before {
+  content:"▶ ";
+}
+
+.terminal-menu {
+  width:100%;
+  min-height:0;
+  display:grid;
+  grid-template-rows:1fr auto;
+  padding:16px 18px;
+  overflow:hidden;
+}
+.terminal-menu-content {
+  align-self:start;
+  width:min(680px,100%);
+  display:grid;
+  gap:12px;
+  color:var(--green);
+}
+.terminal-menu-content > strong {
+  font-size:13px;
+  letter-spacing:.1em;
+}
+.course-choice-list {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+.course-choice-list button {
+  width:100%;
+  display:grid;
+  grid-template-columns:120px minmax(0,1fr);
+  align-items:center;
+  gap:14px;
+  padding:10px 12px;
+  border:1px solid var(--green-dim);
+  background:transparent;
+  color:var(--green);
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+.course-choice-list button:hover {
+  background:rgba(113,255,141,.05);
+}
+.course-choice-list button.selected {
+  background:rgba(113,255,141,.09);
+  box-shadow:inset 3px 0 0 var(--green);
+}
+.course-choice-list button b {
+  font-size:12px;
+  letter-spacing:.05em;
+}
+.course-choice-list button span {
+  color:#8ab895;
+  font-size:11px;
+  line-height:1.3;
+}
+.screen-back {
+  justify-self:start;
+  margin-top:12px;
+  padding:7px 10px;
+  border:1px solid var(--green-dim);
+  background:transparent;
+  color:var(--green);
+  font:inherit;
+  font-size:10px;
+  letter-spacing:.08em;
+  cursor:pointer;
+}
+.screen-back:hover {
+  background:rgba(113,255,141,.08);
+}
