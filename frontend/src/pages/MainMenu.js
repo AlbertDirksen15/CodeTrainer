@@ -416,12 +416,21 @@ export default function MainMenu() {
   const savedLesson = JSON.parse(localStorage.getItem(progressKey) || '{}');
   const conceptMap = Object.fromEntries((course.concepts || []).map((concept) => [concept.id, concept]));
   let partOffset = 0;
+  const stepConcepts = lessonStep ? {
+    '1.1': ['mysql.select'],
+    '1.2': ['mysql.all-columns'],
+    '1.3': ['mysql.from'],
+    '1.4': ['mysql.table-name'],
+    '1.5': ['mysql.select', 'mysql.all-columns'],
+    '1.6': ['mysql.select', 'mysql.all-columns', 'mysql.from'],
+    '1.7': ['mysql.select', 'mysql.all-columns', 'mysql.from', 'mysql.table-name', 'mysql.statement-end']
+  }[lessonStep.id] : null;
   const explainedParts = (lesson.parts || []).map((part) => {
     const start = partOffset;
     partOffset += part.text.length;
     return { ...part, start, end: partOffset, concept: part.concept ? conceptMap[part.concept] : null };
-  }).filter((part) => part.concept);
-  const activePartIndex = explainedParts.findIndex((part) => inputText.length >= part.start && inputText.length < part.end);
+  }).filter((part) => part.concept && (!stepConcepts || stepConcepts.includes(part.concept.id)));
+  const activePartIndex = lessonStep ? 0 : explainedParts.findIndex((part) => inputText.length >= part.start && inputText.length < part.end);
   const nextKeys = useMemo(() => {
     const keys = [physicalKeyForChar(nextChar)];
     if (requiresShift(nextChar)) keys.push('Shift-Left');
@@ -660,7 +669,7 @@ export default function MainMenu() {
                   <div className="explain-terminal-head">CODE EXPLAIN</div>
                   <div className="explain-terminal-body" ref={explainBodyRef}>
                     {explainedParts.length ? explainedParts.map((part, index) => {
-                      const state = inputText.length >= part.end ? 'done' : index === activePartIndex ? 'active' : 'future';
+                      const state = lessonStep ? (index === activePartIndex ? 'active' : 'future') : (inputText.length >= part.end ? 'done' : index === activePartIndex ? 'active' : 'future');
                       return (
                         <div ref={state === 'active' ? activeExplainRef : null} className={`explain-line ${state}`} key={`${part.start}-${part.text}`}>
                           <strong>{state === 'done' ? '✓' : state === 'active' ? '▶' : '·'} {part.text}</strong>
