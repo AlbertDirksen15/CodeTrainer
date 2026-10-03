@@ -5,13 +5,67 @@ import mysqlSelectLesson from '../data/courses/mysql/lessons/001-select.json';
 import mysqlWhereLesson from '../data/courses/mysql/lessons/002-where.json';
 import legacyLessons from '../data/lessons.json';
 
+const javascriptConcepts = [
+  { id: 'js.function', title: 'function', explanation: 'Объявляем новую функцию.' },
+  { id: 'js.function-name', title: 'Имя функции', explanation: 'Задаём имя функции, чтобы потом её вызывать.' },
+  { id: 'js.parameter', title: 'Параметр', explanation: 'Указываем данные, которые функция получает при вызове.' },
+  { id: 'js.block-open', title: '{', explanation: 'Открываем тело функции — здесь находятся её команды.' },
+  { id: 'js.return', title: 'return', explanation: 'Возвращаем результат работы функции.' },
+  { id: 'js.template', title: 'Шаблонная строка', explanation: 'Создаём строку и вставляем в неё значение переменной через ${...}.' },
+  { id: 'js.block-close', title: '}', explanation: 'Закрываем тело функции.' },
+  { id: 'js.let', title: 'let', explanation: 'Создаём переменную, значение которой можно изменить.' },
+  { id: 'js.const', title: 'const', explanation: 'Создаём переменную, которую нельзя переназначить.' },
+  { id: 'js.variable-name', title: 'Имя переменной', explanation: 'Даём переменной понятное имя.' },
+  { id: 'js.assignment', title: '=', explanation: 'Присваиваем переменной значение.' },
+  { id: 'js.value', title: 'Значение', explanation: 'Записываем значение, которое будет храниться в переменной.' },
+  { id: 'js.statement-end', title: ';', explanation: 'Завершаем инструкцию JavaScript.' }
+];
+
+const javascriptParts = {
+  1: [
+    { text: 'function', concept: 'js.function' },
+    { text: ' ', kind: 'whitespace' },
+    { text: 'greet', concept: 'js.function-name' },
+    { text: '(', kind: 'syntax' },
+    { text: 'name', concept: 'js.parameter' },
+    { text: ') ', kind: 'syntax' },
+    { text: '{', concept: 'js.block-open' },
+    { text: '\n  ', kind: 'whitespace' },
+    { text: 'return', concept: 'js.return' },
+    { text: ' ', kind: 'whitespace' },
+    { text: '`Hello, ${name}!`', concept: 'js.template' },
+    { text: ';', concept: 'js.statement-end' },
+    { text: '\n', kind: 'whitespace' },
+    { text: '}', concept: 'js.block-close' }
+  ],
+  2: [
+    { text: 'let', concept: 'js.let' },
+    { text: ' ', kind: 'whitespace' },
+    { text: 'age', concept: 'js.variable-name' },
+    { text: ' ', kind: 'whitespace' },
+    { text: '=', concept: 'js.assignment' },
+    { text: ' ', kind: 'whitespace' },
+    { text: '30', concept: 'js.value' },
+    { text: ';', concept: 'js.statement-end' },
+    { text: '\n', kind: 'whitespace' },
+    { text: 'const', concept: 'js.const' },
+    { text: ' ', kind: 'whitespace' },
+    { text: 'name', concept: 'js.variable-name' },
+    { text: ' ', kind: 'whitespace' },
+    { text: '=', concept: 'js.assignment' },
+    { text: ' ', kind: 'whitespace' },
+    { text: "'Alice'", concept: 'js.value' },
+    { text: ';', concept: 'js.statement-end' }
+  ]
+};
+
 const courseCatalog = [
   {
     id: 'javascript',
     title: 'JavaScript',
     description: 'Исходный курс CodeTrainer.',
-    concepts: [],
-    lessons: legacyLessons.map((item) => ({ ...item, id: `js-${item.id}`, code: item.text, parts: [] }))
+    concepts: javascriptConcepts,
+    lessons: legacyLessons.map((item) => ({ ...item, id: `js-${item.id}`, code: item.text, parts: javascriptParts[item.id] || [] }))
   },
   {
     ...mysqlCourse,
