@@ -2,6 +2,7 @@ import '../index.css';
 import mysqlCourse from '../data/courses/mysql/course.json';
 import mysqlConcepts from '../data/courses/mysql/concepts.json';
 import mysqlSelectLesson from '../data/courses/mysql/lessons/001-select.json';
+import mysqlWhereLesson from '../data/courses/mysql/lessons/002-where.json';
 import legacyLessons from '../data/lessons.json';
 
 const courseCatalog = [
@@ -15,7 +16,7 @@ const courseCatalog = [
   {
     ...mysqlCourse,
     concepts: mysqlConcepts,
-    lessons: [mysqlSelectLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title })))
+    lessons: [mysqlSelectLesson, mysqlWhereLesson].flatMap((file) => file.exercises.map((exercise) => ({ ...exercise, definition: exercise.title })))
   }
 ];
 import React, { useEffect, useMemo, useState } from 'react';
@@ -261,18 +262,30 @@ export default function MainMenu() {
                         ))}
                       </div>
                     </>}
-                    {menuSection === 'PROGRESS' && <><strong>PROGRESS // {course.title}</strong><span>{savedLesson.completed ? 'LESSON 01 // COMPLETE' : 'LESSON 01 // NOT COMPLETE'}</span><small>{progress}% CURRENT</small></>}
+                    {menuSection === 'PROGRESS' && <><strong>PROGRESS // {course.title}</strong><span>{savedLesson.completed || completed ? `LESSON ${String(currentLessonIndex + 1).padStart(2,'0')} // COMPLETE` : `LESSON ${String(currentLessonIndex + 1).padStart(2,'0')} // NOT COMPLETE`}</span><small>{progress}% CURRENT</small></>}
                     {menuSection === 'SETTINGS' && <><strong>SETTINGS</strong><span>LAYOUT CHECK // {layoutCheck ? 'ON' : 'OFF'}</span><small>THEME // {theme.toUpperCase()}</small></>}
                   </div>
                   <button className="screen-back" onClick={() => setMenuOpen(false)}>BACK TO LESSON</button>
+                </div>
+              ) : completed ? (
+                <div className="lesson-complete">
+                  <div className="complete-scan" />
+                  <div className="complete-glitch" data-text="LESSON COMPLETE">LESSON COMPLETE</div>
+                  <div className="complete-meta">DATA VERIFIED // {course.title.toUpperCase()} // LESSON {String(currentLessonIndex + 1).padStart(2,'0')}</div>
+                  <div className="complete-bar"><i /></div>
+                  {currentLessonIndex < lessons.length - 1 ? (
+                    <button className="complete-next" onClick={nextLesson}>NEXT LESSON →</button>
+                  ) : (
+                    <div className="complete-course">COURSE MODULE COMPLETE</div>
+                  )}
                 </div>
               ) : (
                 <div className="screen-content">
                   <p className="screen-kicker">{lesson.definition}</p>
                   <div className="code-line">
                     <span className="typed">{inputText}</span>
-                    {!completed && <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>}
-                    <span className="remaining">{targetCommand.slice(inputText.length + (completed ? 0 : 1))}</span>
+                    <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>
+                    <span className="remaining">{targetCommand.slice(inputText.length + 1)}</span>
                   </div>
                 </div>
               )}
