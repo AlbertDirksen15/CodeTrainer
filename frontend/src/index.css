@@ -550,3 +550,36 @@ button { font: inherit; }
   color:var(--green);
   background:rgba(113,255,141,.08);
 }
+
+/* SETTINGS repair: compact content only; no screen/menu geometry changes */
+.terminal-menu-content:has(.music-setting) {
+  gap:7px;
+}
+.terminal-menu-content:has(.music-setting) > strong {
+  margin-bottom:2px;
+}
+.music-setting {
+  margin:2px 0 0;
+  padding:0;
+  border-top:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+}
+.music-setting span {
+  min-width:0;
+  line-height:1.15;
+}
+.music-setting button {
+  padding:5px 8px;
+  line-height:1;
+  white-space:nowrap;
+}
+.music-selector {
+  width:100%;
+  max-width:230px;
+  height:26px;
+  box-sizing:border-box;
+  margin:0;
+}
