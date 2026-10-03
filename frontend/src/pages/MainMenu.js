@@ -1,11 +1,13 @@
 import '../index.css';
 import mysqlCourse from '../data/courses/mysql/course.json';
 import mysqlSelectLesson from '../data/courses/mysql/lessons/001-select.json';
+import mysqlConcepts from '../data/courses/mysql/concepts.json';
 
 const courseCatalog = [
   {
     ...mysqlCourse,
-    lessons: [mysqlSelectLesson]
+    lessons: [mysqlSelectLesson],
+    concepts: mysqlConcepts
   }
 ];
 import React, { useEffect, useMemo, useState } from 'react';
@@ -66,6 +68,7 @@ export default function MainMenu() {
   const [completed, setCompleted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const course = courseCatalog.find((item) => item.id === selectedCourseId) || courseCatalog[0];
   const lessons = course.lessons.flatMap((lessonFile) =>
@@ -80,6 +83,15 @@ export default function MainMenu() {
   const nextChar = targetCommand[inputText.length] || '';
   const maxErrors = Math.max(1, Math.ceil(targetCommand.length * 0.03));
   const progress = Math.round((inputText.length / targetCommand.length) * 100);
+  const conceptMap = Object.fromEntries((course.concepts || []).map((concept) => [concept.id, concept]));
+  let partOffset = 0;
+  const explainedParts = (lesson.parts || []).map((part) => {
+    const start = partOffset;
+    partOffset += part.text.length;
+    const concept = part.concept ? conceptMap[part.concept] : null;
+    return { ...part, start, end: partOffset, concept };
+  }).filter((part) => part.concept);
+  const activePartIndex = explainedParts.findIndex((part) => inputText.length >= part.start && inputText.length < part.end);
   const nextKeys = useMemo(() => {
     const keys = [physicalKeyForChar(nextChar)];
     if (requiresShift(nextChar)) keys.push('Shift-Left');
@@ -107,13 +119,14 @@ export default function MainMenu() {
     }
   }, [completed, errors, progressKey]);
 
-  const selectCourse = (event) => {
-    setSelectedCourseId(event.target.value);
+  const selectCourse = (courseId) => {
+    setSelectedCourseId(courseId);
     setCurrentLessonIndex(0);
     setInputText('');
     setErrors(0);
     setCompleted(false);
     setIsPaused(false);
+    setMenuOpen(false);
   };
 
   useEffect(() => {
@@ -138,7 +151,7 @@ export default function MainMenu() {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (isPaused || completed) return;
+      if (menuOpen || isPaused || completed) return;
       if (['Shift','Control','Alt','CapsLock','Tab'].includes(event.key)) return;
 
       let typedChar = '';
@@ -170,7 +183,7 @@ export default function MainMenu() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck]);
+  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck, menuOpen]);
 
   const restartLesson = () => {
     setInputText('');
@@ -199,11 +212,61 @@ export default function MainMenu() {
         </div>
       )}
 
+      {menuOpen && (
+        <section className="system-menu">
+          <div className="menu-terminal">
+            <div className="menu-topline">
+              <span>CODE MEMORY TRAINER // MENU</span>
+              <button className="menu-close" onClick={() => setMenuOpen(false)}>×</button>
+            </div>
+            <div className="menu-body">
+              <div className="menu-nav">
+                <strong>COURSES</strong>
+                <span>PROGRESS</span>
+                <span>SETTINGS</span>
+              </div>
+              <div className="course-grid">
+                {courseCatalog.map((item) => {
+                  const total = item.lessons.reduce((sum, file) => sum + file.exercises.length, 0);
+                  const done = item.lessons.flatMap((file) => file.exercises)
+                    .filter((exercise) => JSON.parse(localStorage.getItem(`ct-progress:${item.id}:${exercise.id}`) || '{}').completed).length;
+                  return (
+                    <button key={item.id} className={`course-card ${item.id === course.id ? 'selected' : ''}`} onClick={() => selectCourse(item.id)}>
+                      <span className="course-card-label">DATABASE COURSE</span>
+                      <strong>{item.title}</strong>
+                      <small>{item.description}</small>
+                      <div className="course-card-progress">{done}/{total} COMPLETE</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="workspace">
+        <aside className="explain-panel">
+          <div className="panel-heading"><span>CODE EXPLAIN</span></div>
+          <div className="explain-list">
+            {explainedParts.map((part, index) => {
+              const state = inputText.length >= part.end ? 'done' : index === activePartIndex ? 'active' : 'future';
+              return (
+                <div className={`explain-item ${state}`} key={`${part.start}-${part.text}`}>
+                  <span className="explain-marker">{state === 'done' ? '✓' : state === 'active' ? '▶' : '·'}</span>
+                  <div>
+                    <strong>{part.text}</strong>
+                    <small>{part.concept.explanation}</small>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </aside>
         <div className="screen-shell">
           <div className="screen-topline">
             <span>LESSON {String(currentLessonIndex + 1).padStart(2,'0')}</span>
-            <span className="screen-status">● READY</span>
+            <div className="screen-top-actions"><span className="screen-status">● READY</span><button className="hamburger" onClick={() => setMenuOpen(true)} aria-label="Open menu">☰</button></div>
           </div>
           <div className="screen-content">
             <p className="screen-kicker">{lesson.definition}</p>
@@ -226,12 +289,6 @@ export default function MainMenu() {
               {theme === 'light' ? 'DARK' : 'LIGHT'}
             </button>
           </div>
-          <label className="course-select">
-            <span>COURSE</span>
-            <select value={course.id} onChange={selectCourse}>
-              {courseCatalog.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
-            </select>
-          </label>
           <div className="stat"><span>USER</span><strong>LOCAL</strong></div>
           <div className="stat"><span>SAVED</span><strong>{savedLesson.completed ? 'COMPLETE' : 'NOT YET'}</strong></div>
           <div className="stat"><span>LESSON</span><strong>{currentLessonIndex + 1}/{lessons.length}</strong></div>
