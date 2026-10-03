@@ -76,3 +76,7 @@ button { font: inherit; }
   .panel-heading,.progress-track,.layout-lamp,.panel-actions { grid-column:auto; }
   .trainer-footer { display:none; }
 }
+
+.course-select { display:grid; gap:6px; padding:10px 0 14px; border-bottom:1px dashed var(--key-edge); }
+.course-select span { color:var(--muted); font-size:12px; }
+.course-select select { width:100%; border:1px solid var(--key-edge); background:var(--key); color:var(--ink); padding:9px; font:inherit; font-weight:700; }
