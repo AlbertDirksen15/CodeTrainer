@@ -275,3 +275,28 @@ button { font: inherit; }
 .screen-back:hover {
   background:rgba(113,255,141,.08);
 }
+
+/* MENU button — green-screen styling only */
+.hamburger {
+  width:30px;
+  height:26px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:1px solid var(--green-dim);
+  border-radius:2px;
+  background:rgba(113,255,141,.04);
+  color:var(--green);
+  font:inherit;
+  font-size:15px;
+  line-height:1;
+  cursor:pointer;
+}
+.hamburger:hover {
+  background:rgba(113,255,141,.12);
+  border-color:var(--green);
+  box-shadow:0 0 8px rgba(113,255,141,.18);
+}
+.hamburger:active {
+  transform:translateY(1px);
+}
