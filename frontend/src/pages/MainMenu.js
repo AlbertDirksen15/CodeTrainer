@@ -330,6 +330,8 @@ export default function MainMenu() {
   const musicStopRef = useRef(null);
   const activeExplainRef = useRef(null);
   const explainBodyRef = useRef(null);
+  const lessonBodyRef = useRef(null);
+  const currentCharRef = useRef(null);
 
   const course = courseCatalog.find((item) => item.id === selectedCourseId) || courseCatalog[1];
   const lessons = course.lessons;
@@ -367,6 +369,25 @@ export default function MainMenu() {
     const targetScrollTop = Math.max(0, activeCenter - centerLine);
     container.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
   }, [inputText, activePartIndex, menuOpen, currentLessonIndex]);
+
+  useEffect(() => {
+    if (menuOpen || completed || !lessonBodyRef.current || !currentCharRef.current) return;
+
+    const container = lessonBodyRef.current;
+    const cursor = currentCharRef.current;
+    const containerRect = container.getBoundingClientRect();
+    const cursorRect = cursor.getBoundingClientRect();
+    const cursorCenter = cursorRect.top - containerRect.top + cursorRect.height / 2;
+    const middle = container.clientHeight / 2;
+
+    if (cursorCenter > middle) {
+      container.scrollBy({
+        top: cursorCenter - middle,
+        behavior: 'smooth'
+      });
+    }
+  }, [inputText, menuOpen, completed, currentLessonIndex]);
+
 
   useEffect(() => {
     localStorage.setItem('ct-theme', theme);
@@ -659,11 +680,11 @@ export default function MainMenu() {
                   )}
                 </div>
               ) : (
-                <div className="screen-content">
+                <div className="screen-content" ref={lessonBodyRef}>
                   <p className="screen-kicker">{lesson.definition}</p>
                   <div className="code-line">
                     <span className="typed">{inputText}</span>
-                    <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>
+                    <span className="current-char" ref={currentCharRef}>{nextChar === '\n' ? '↵' : nextChar || ' '}</span>
                     <span className="remaining">{targetCommand.slice(inputText.length + 1)}</span>
                   </div>
                 </div>
