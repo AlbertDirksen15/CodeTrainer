@@ -759,6 +759,7 @@ export default function MainMenu() {
               ) : lessonView === 'theory' ? (
                 <div className="lesson-theory">
                   <div className="lesson-theory-scroll">
+                    <button className="exercise-back" onClick={() => { setMenuSection('COURSES'); setCourseMenuId(course.id); setMenuOpen(true); }}>← ALL LECTURES</button>
                     <small>{course.title.toUpperCase()} // LECTURE {String(currentLessonIndex + 1).padStart(2,'0')}</small>
                     {typeof lesson.theory === 'object' && lesson.theory.translations && (
                       <div className="theory-language">
