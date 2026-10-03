@@ -7,14 +7,145 @@
       "title": "Выбрать все столбцы",
       "code": "SELECT * FROM movies;",
       "parts": [
-        {"text":"SELECT","concept":"mysql.select"},
-        {"text":" ","kind":"whitespace"},
-        {"text":"*","concept":"mysql.all-columns"},
-        {"text":" ","kind":"whitespace"},
-        {"text":"FROM","concept":"mysql.from"},
-        {"text":" ","kind":"whitespace"},
-        {"text":"movies","concept":"mysql.table-name"},
-        {"text":";","concept":"mysql.statement-end"}
+        {
+          "text": "SELECT",
+          "concept": "mysql.select"
+        },
+        {
+          "text": " ",
+          "kind": "whitespace"
+        },
+        {
+          "text": "*",
+          "concept": "mysql.all-columns"
+        },
+        {
+          "text": " ",
+          "kind": "whitespace"
+        },
+        {
+          "text": "FROM",
+          "concept": "mysql.from"
+        },
+        {
+          "text": " ",
+          "kind": "whitespace"
+        },
+        {
+          "text": "movies",
+          "concept": "mysql.table-name"
+        },
+        {
+          "text": ";",
+          "concept": "mysql.statement-end"
+        }
+      ],
+      "steps": [
+        {
+          "id": "1.1",
+          "label": "SELECT",
+          "code": "SELECT SELECT SELECT SELECT SELECT\nSELECT SELECT SELECT SELECT SELECT\nSELECT SELECT SELECT SELECT SELECT",
+          "explain": [
+            {
+              "text": "SELECT",
+              "description": "Команда SELECT говорит базе данных: покажи данные."
+            }
+          ]
+        },
+        {
+          "id": "1.2",
+          "label": "*",
+          "code": "* * * * * * * * * * * * * * *\n* * * * * * * * * * * * * * *\n* * * * * * * * * * * * * * *",
+          "explain": [
+            {
+              "text": "*",
+              "description": "Звёздочка * означает: показать все столбцы."
+            }
+          ]
+        },
+        {
+          "id": "1.3",
+          "label": "FROM",
+          "code": "FROM FROM FROM FROM FROM FROM\nFROM FROM FROM FROM FROM FROM\nFROM FROM FROM FROM FROM FROM",
+          "explain": [
+            {
+              "text": "FROM",
+              "description": "Команда FROM говорит, из какой таблицы взять данные."
+            }
+          ]
+        },
+        {
+          "id": "1.4",
+          "label": "movies",
+          "code": "movies movies movies movies movies\nmovies movies movies movies movies\nmovies movies movies movies movies",
+          "explain": [
+            {
+              "text": "movies",
+              "description": "movies — имя таблицы, из которой мы берём данные."
+            }
+          ]
+        },
+        {
+          "id": "1.5",
+          "label": "SELECT *",
+          "code": "SELECT * SELECT * SELECT * SELECT *\nSELECT * SELECT * SELECT * SELECT *\nSELECT * SELECT * SELECT * SELECT *",
+          "explain": [
+            {
+              "text": "SELECT",
+              "description": "SELECT — показать данные."
+            },
+            {
+              "text": "*",
+              "description": "* — показать все столбцы."
+            }
+          ]
+        },
+        {
+          "id": "1.6",
+          "label": "SELECT * FROM",
+          "code": "SELECT * FROM SELECT * FROM SELECT * FROM\nSELECT * FROM SELECT * FROM SELECT * FROM\nSELECT * FROM SELECT * FROM SELECT * FROM",
+          "explain": [
+            {
+              "text": "SELECT",
+              "description": "SELECT — показать данные."
+            },
+            {
+              "text": "*",
+              "description": "* — показать все столбцы."
+            },
+            {
+              "text": "FROM",
+              "description": "FROM — указать, из какой таблицы взять данные."
+            }
+          ]
+        },
+        {
+          "id": "1.7",
+          "label": "FULL QUERY",
+          "code": "SELECT * FROM movies; SELECT * FROM movies;\nSELECT * FROM movies; SELECT * FROM movies;\nSELECT * FROM movies; SELECT * FROM movies;",
+          "explain": [
+            {
+              "text": "SELECT",
+              "description": "SELECT — показать данные."
+            },
+            {
+              "text": "*",
+              "description": "* — показать все столбцы."
+            },
+            {
+              "text": "FROM",
+              "description": "FROM — взять данные из указанной таблицы."
+            },
+            {
+              "text": "movies",
+              "description": "movies — имя таблицы."
+            },
+            {
+              "text": ";",
+              "description": "; — конец SQL-команды."
+            }
+          ]
+        }
       ]
     }
   ]
