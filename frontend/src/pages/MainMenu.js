@@ -318,6 +318,7 @@ export default function MainMenu() {
   const [isEnglishLayout, setIsEnglishLayout] = useState(null);
   const [layoutCheck, setLayoutCheck] = useState(() => localStorage.getItem('ct-layout-check') === 'on');
   const [errors, setErrors] = useState(0);
+  const [testInput, setTestInput] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('ct-theme') || 'light');
@@ -470,7 +471,7 @@ export default function MainMenu() {
       const isAsciiInput = /^[\x20-\x7E]$/.test(event.key) || event.key === 'Enter';
       setIsEnglishLayout(isAsciiInput);
 
-      if (typedChar === nextChar) {
+      if (testInput || typedChar === nextChar) {
         const next = inputText + typedChar;
         setInputText(next);
         if (next === targetCommand) setCompleted(true);
@@ -484,7 +485,7 @@ export default function MainMenu() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck, menuOpen]);
+  }, [inputText, nextChar, targetCommand, completed, isPaused, layoutCheck, menuOpen, testInput]);
 
   const restartLesson = () => {
     setInputText('');
@@ -586,7 +587,24 @@ export default function MainMenu() {
                         );
                       })()}
                     </>}
-                    {menuSection === 'PROGRESS' && <><strong>PROGRESS // {course.title}</strong><span>{savedLesson.completed || completed ? `LESSON ${String(currentLessonIndex + 1).padStart(2,'0')} // COMPLETE` : `LESSON ${String(currentLessonIndex + 1).padStart(2,'0')} // NOT COMPLETE`}</span><small>{progress}% CURRENT</small></>}
+                    {menuSection === 'PROGRESS' && <>
+                      <strong>PROGRESS // {course.title}</strong>
+                      <div className="progress-lesson-list">
+                        {lessons.map((item, index) => {
+                          const itemKey = `ct-progress:${course.id}:${item.id}`;
+                          const stored = JSON.parse(localStorage.getItem(itemKey) || '{}');
+                          const isCurrent = index === currentLessonIndex;
+                          const isComplete = stored.completed || (isCurrent && completed);
+                          const percent = isComplete ? 100 : (isCurrent ? progress : 0);
+                          return (
+                            <div className={`progress-lesson-row ${isCurrent ? 'current' : ''}`} key={item.id}>
+                              <span>LESSON {String(index + 1).padStart(2,'0')}</span>
+                              <b>{isComplete ? 'COMPLETE' : `${percent}%`}</b>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>}
                     {menuSection === 'SETTINGS' && <>
                       <strong>SETTINGS</strong>
                       <span>LAYOUT CHECK // {layoutCheck ? 'ON' : 'OFF'}</span>
@@ -679,7 +697,8 @@ export default function MainMenu() {
         </aside>
       </section>
 
-      <section className="keyboard-deck" aria-label="Virtual keyboard">
+      <section className="keyboard-area">
+        <div className="keyboard-deck" aria-label="Virtual keyboard">
         {keyboardLayout.map((row, rowIndex) => (
           <div className="key-row" key={rowIndex}>
             {row.map((key, keyIndex) => {
@@ -707,6 +726,14 @@ export default function MainMenu() {
             })}
           </div>
         ))}
+        </div>
+        <button
+          className={`test-input-toggle ${testInput ? 'active' : ''}`}
+          onClick={() => setTestInput((value) => !value)}
+          title="Temporary testing mode: every typed key advances the lesson"
+        >
+          TEST INPUT<br />{testInput ? 'ON' : 'OFF'}
+        </button>
       </section>
 
       <footer className="trainer-footer">
