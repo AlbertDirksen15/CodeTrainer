@@ -789,13 +789,6 @@ export default function MainMenu() {
                     })()}
                   </div>
                   <div className="lesson-theory-action">
-                    {lessonSteps.length > 0 && <div className="lesson-step-list">
-                      {lessonSteps.map((subStep, index) => {
-                        const done = JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${subStep.id}`) || '{}').completed;
-                        const previousDone = index === 0 || JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${lessonSteps[index - 1].id}`) || '{}').completed;
-                        return <button key={subStep.id} disabled={!previousDone} className={done ? 'done' : ''} onClick={() => { if (previousDone) { setLessonStepIndex(index); setInputText(''); setErrors(0); setCompleted(false); setLessonView('exercise'); } }}><b>{subStep.id}</b> {subStep.label}{done ? ' ✓' : ''}</button>;
-                      })}
-                    </div>}
                     <button onClick={() => {
                       if (lessonSteps.length) {
                         const firstOpen = lessonSteps.findIndex((subStep, index) => !JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${subStep.id}`) || '{}').completed && (index === 0 || JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${lessonSteps[index - 1].id}`) || '{}').completed));
@@ -803,6 +796,13 @@ export default function MainMenu() {
                       }
                       setInputText(''); setErrors(0); setCompleted(false); setLessonView('exercise');
                     }}>START EXERCISE →</button>
+                    {lessonSteps.length > 0 && <div className="lesson-step-list">
+                      {lessonSteps.map((subStep, index) => {
+                        const done = JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${subStep.id}`) || '{}').completed;
+                        const previousDone = index === 0 || JSON.parse(localStorage.getItem(`ct-progress:${course.id}:${lesson.id}:step:${lessonSteps[index - 1].id}`) || '{}').completed;
+                        return <button key={subStep.id} disabled={!previousDone} className={done ? 'done' : ''} onClick={() => { if (previousDone) { setLessonStepIndex(index); setInputText(''); setErrors(0); setCompleted(false); setLessonView('exercise'); } }}><b>{subStep.id}</b> {subStep.label}{done ? ' ✓' : ''}</button>;
+                      })}
+                    </div>}
                   </div>
                 </div>
               ) : completed ? (
