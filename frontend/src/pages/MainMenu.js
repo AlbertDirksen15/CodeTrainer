@@ -326,6 +326,7 @@ export default function MainMenu() {
   const [musicOn, setMusicOn] = useState(false);
   const [musicMode, setMusicMode] = useState(() => localStorage.getItem('ct-music-mode') || 'ambient');
   const musicStopRef = useRef(null);
+  const activeExplainRef = useRef(null);
 
   const course = courseCatalog.find((item) => item.id === selectedCourseId) || courseCatalog[1];
   const lessons = course.lessons;
@@ -349,6 +350,12 @@ export default function MainMenu() {
     if (requiresShift(nextChar)) keys.push('Shift-Left');
     return keys;
   }, [nextChar]);
+
+  useEffect(() => {
+    if (!menuOpen && activeExplainRef.current) {
+      activeExplainRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [activePartIndex, menuOpen, currentLessonIndex]);
 
   useEffect(() => {
     localStorage.setItem('ct-theme', theme);
@@ -523,7 +530,7 @@ export default function MainMenu() {
                     {explainedParts.length ? explainedParts.map((part, index) => {
                       const state = inputText.length >= part.end ? 'done' : index === activePartIndex ? 'active' : 'future';
                       return (
-                        <div className={`explain-line ${state}`} key={`${part.start}-${part.text}`}>
+                        <div ref={state === 'active' ? activeExplainRef : null} className={`explain-line ${state}`} key={`${part.start}-${part.text}`}>
                           <strong>{state === 'done' ? '✓' : state === 'active' ? '▶' : '·'} {part.text}</strong>
                           <span>{part.concept.explanation}</span>
                         </div>
