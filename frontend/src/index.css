@@ -743,3 +743,38 @@ button { font: inherit; }
   color:var(--green);
   background:rgba(113,255,141,.08);
 }
+
+
+/* Lecture language switcher and lesson table — green screen only. */
+.theory-language {
+  display:flex;
+  gap:5px;
+  justify-content:flex-end;
+  margin:0 0 8px;
+}
+.theory-language button {
+  padding:4px 8px;
+  border:1px solid var(--green-dim);
+  background:transparent;
+  color:#8ab895;
+  font:inherit;
+  font-size:10px;
+  cursor:pointer;
+}
+.theory-language button.active {
+  color:var(--green);
+  background:rgba(113,255,141,.1);
+}
+.theory-table {
+  width:min(620px,100%);
+  margin:10px 0 16px;
+  border-collapse:collapse;
+  color:#a3ffb4;
+  font-size:12px;
+}
+.theory-table th,.theory-table td {
+  padding:7px 9px;
+  border:1px solid var(--green-dim);
+  text-align:left;
+}
+.theory-table th { color:var(--green); }
