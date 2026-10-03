@@ -212,39 +212,6 @@ export default function MainMenu() {
         </div>
       )}
 
-      {menuOpen && (
-        <section className="system-menu">
-          <div className="menu-terminal">
-            <div className="menu-topline">
-              <span>CODE MEMORY TRAINER // MENU</span>
-              <button className="menu-close" onClick={() => setMenuOpen(false)}>×</button>
-            </div>
-            <div className="menu-body">
-              <div className="menu-nav">
-                <strong>COURSES</strong>
-                <span>PROGRESS</span>
-                <span>SETTINGS</span>
-              </div>
-              <div className="course-grid">
-                {courseCatalog.map((item) => {
-                  const total = item.lessons.reduce((sum, file) => sum + file.exercises.length, 0);
-                  const done = item.lessons.flatMap((file) => file.exercises)
-                    .filter((exercise) => JSON.parse(localStorage.getItem(`ct-progress:${item.id}:${exercise.id}`) || '{}').completed).length;
-                  return (
-                    <button key={item.id} className={`course-card ${item.id === course.id ? 'selected' : ''}`} onClick={() => selectCourse(item.id)}>
-                      <span className="course-card-label">DATABASE COURSE</span>
-                      <strong>{item.title}</strong>
-                      <small>{item.description}</small>
-                      <div className="course-card-progress">{done}/{total} COMPLETE</div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
       <section className="workspace">
         <aside className="explain-panel">
           <div className="panel-heading"><span>CODE EXPLAIN</span></div>
@@ -266,20 +233,52 @@ export default function MainMenu() {
         <div className="screen-shell">
           <div className="screen-topline">
             <span>LESSON {String(currentLessonIndex + 1).padStart(2,'0')}</span>
-            <div className="screen-top-actions"><span className="screen-status">● READY</span><button className="hamburger" onClick={() => setMenuOpen(true)} aria-label="Open menu">☰</button></div>
+            <div className="screen-top-actions"><span className="screen-status">{menuOpen ? '● MENU' : '● READY'}</span><button className="hamburger" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle menu">{menuOpen ? '×' : '☰'}</button></div>
           </div>
-          <div className="screen-content">
-            <p className="screen-kicker">{lesson.definition}</p>
-            <div className="code-line">
-              <span className="typed">{inputText}</span>
-              {!completed && <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>}
-              <span className="remaining">{targetCommand.slice(inputText.length + (completed ? 0 : 1))}</span>
-            </div>
-          </div>
-          <div className="screen-footer">
-            <span>NEXT KEY: <b>{keyLabel(nextChar) || 'DONE'}</b></span>
-            <span>{completed ? 'LESSON COMPLETE' : 'TYPE TO CONTINUE'}</span>
-          </div>
+          {menuOpen ? (
+            <>
+              <div className="screen-menu">
+                <div className="screen-menu-nav">
+                  <strong>COURSES</strong>
+                  <span>PROGRESS</span>
+                  <span>SETTINGS</span>
+                </div>
+                <div className="screen-course-list">
+                  {courseCatalog.map((item) => {
+                    const exercises = item.lessons.flatMap((file) => file.exercises);
+                    const done = exercises.filter((exercise) =>
+                      JSON.parse(localStorage.getItem(`ct-progress:${item.id}:${exercise.id}`) || '{}').completed
+                    ).length;
+                    return (
+                      <button key={item.id} className={`screen-course ${item.id === course.id ? 'selected' : ''}`} onClick={() => selectCourse(item.id)}>
+                        <span><b>{item.title}</b><small>{item.description}</small></span>
+                        <em>{done}/{exercises.length}</em>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="screen-footer">
+                <span>MENU // COURSES</span>
+                <button className="screen-back" onClick={() => setMenuOpen(false)}>BACK TO LESSON</button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="screen-content">
+                <p className="screen-kicker">{lesson.definition}</p>
+                <div className="code-line">
+                  <span className="typed">{inputText}</span>
+                  {!completed && <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>}
+                  <span className="remaining">{targetCommand.slice(inputText.length + (completed ? 0 : 1))}</span>
+                </div>
+              </div>
+              <div className="screen-footer">
+                <span>NEXT KEY: <b>{keyLabel(nextChar) || 'DONE'}</b></span>
+                <span>{completed ? 'LESSON COMPLETE' : 'TYPE TO CONTINUE'}</span>
+              </div>
+            </>
+          )}
         </div>
 
         <aside className="info-panel">
