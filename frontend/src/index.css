@@ -24,7 +24,7 @@ button { font: inherit; }
 .screen-topline,.screen-footer { display:flex; justify-content:space-between; gap:12px; padding:10px 16px; border-bottom:1px solid var(--green-dim); font-size:12px; letter-spacing:.12em; }
 .screen-footer { border-top:1px solid var(--green-dim); border-bottom:0; color:#8ab895; }
 .screen-status { color:#a3ffb4; }
-.screen-content { display:flex; flex-direction:column; justify-content:center; padding:clamp(24px,4vw,70px); overflow:hidden; }
+.screen-content { display:flex; flex-direction:column; justify-content:flex-start; height:100%; min-height:0; padding:clamp(24px,4vw,70px); overflow-y:auto; overflow-x:hidden; scrollbar-width:none; } .screen-content::-webkit-scrollbar { display:none; }
 .screen-kicker { margin:0 0 22px; color:#76a982; font-size:clamp(12px,1.1vw,16px); letter-spacing:.12em; text-transform:uppercase; }
 .code-line { white-space:pre-wrap; overflow-wrap:anywhere; font-size:clamp(19px,2.25vw,36px); line-height:1.6; text-shadow:0 0 8px rgba(113,255,141,.25); }
 .typed { color:var(--green); }
