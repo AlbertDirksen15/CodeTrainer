@@ -327,6 +327,7 @@ export default function MainMenu() {
   const [musicMode, setMusicMode] = useState(() => localStorage.getItem('ct-music-mode') || 'ambient');
   const musicStopRef = useRef(null);
   const activeExplainRef = useRef(null);
+  const explainBodyRef = useRef(null);
 
   const course = courseCatalog.find((item) => item.id === selectedCourseId) || courseCatalog[1];
   const lessons = course.lessons;
@@ -352,10 +353,18 @@ export default function MainMenu() {
   }, [nextChar]);
 
   useEffect(() => {
-    if (!menuOpen && activeExplainRef.current) {
-      activeExplainRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  }, [activePartIndex, menuOpen, currentLessonIndex]);
+    if (menuOpen || !activeExplainRef.current || !explainBodyRef.current) return;
+
+    const container = explainBodyRef.current;
+    const active = activeExplainRef.current;
+    const activeCenter = active.offsetTop + active.offsetHeight / 2;
+    const centerLine = container.clientHeight / 2;
+
+    // Let the active explanation move naturally down to the middle.
+    // After that, keep it around the middle and scroll older text upward.
+    const targetScrollTop = Math.max(0, activeCenter - centerLine);
+    container.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+  }, [inputText, activePartIndex, menuOpen, currentLessonIndex]);
 
   useEffect(() => {
     localStorage.setItem('ct-theme', theme);
@@ -526,7 +535,7 @@ export default function MainMenu() {
               ) : (
                 <>
                   <div className="explain-terminal-head">CODE EXPLAIN</div>
-                  <div className="explain-terminal-body">
+                  <div className="explain-terminal-body" ref={explainBodyRef}>
                     {explainedParts.length ? explainedParts.map((part, index) => {
                       const state = inputText.length >= part.end ? 'done' : index === activePartIndex ? 'active' : 'future';
                       return (
