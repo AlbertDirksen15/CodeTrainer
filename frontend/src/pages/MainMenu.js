@@ -163,20 +163,25 @@ export default function MainMenu() {
             <span className="screen-status">● READY</span>
           </div>
           <div className="screen-body">
-            <aside className="screen-live-info">
-              <div className="live-info-title">CODE EXPLAIN</div>
-              <div className="live-info-row"><strong>SELECT</strong><span>выбирает данные</span></div>
-              <div className="live-info-row"><strong>*</strong><span>все столбцы</span></div>
-              <div className="live-info-row"><strong>FROM</strong><span>указывает таблицу</span></div>
-              <div className="live-info-row"><strong>movies</strong><span>имя таблицы</span></div>
-              <div className="live-info-row"><strong>;</strong><span>конец SQL-инструкции</span></div>
+            <aside className="explain-terminal">
+              <div className="explain-terminal-head">CODE EXPLAIN</div>
+              <div className="explain-terminal-body">
+                <div className="explain-line active"><strong>▶ SELECT</strong><span>выбрать данные</span></div>
+                <div className="explain-line"><strong>· *</strong><span>все столбцы</span></div>
+                <div className="explain-line"><strong>· FROM</strong><span>указывает таблицу</span></div>
+                <div className="explain-line"><strong>· movies</strong><span>имя таблицы</span></div>
+                <div className="explain-line"><strong>· ;</strong><span>конец SQL-инструкции</span></div>
+              </div>
+              <div className="explain-terminal-foot">SYNTAX // MYSQL</div>
             </aside>
-            <div className="screen-content">
-              <p className="screen-kicker">{lesson.definition}</p>
-              <div className="code-line">
-                <span className="typed">{inputText}</span>
-                {!completed && <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>}
-                <span className="remaining">{targetCommand.slice(inputText.length + (completed ? 0 : 1))}</span>
+            <div className="lesson-terminal">
+              <div className="screen-content">
+                <p className="screen-kicker">{lesson.definition}</p>
+                <div className="code-line">
+                  <span className="typed">{inputText}</span>
+                  {!completed && <span className="current-char">{nextChar === '\n' ? '↵' : nextChar || ' '}</span>}
+                  <span className="remaining">{targetCommand.slice(inputText.length + (completed ? 0 : 1))}</span>
+                </div>
               </div>
             </div>
           </div>
