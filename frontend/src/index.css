@@ -132,3 +132,38 @@ button { font: inherit; }
 .explain-line { font-size:12px; line-height:1.2; }
 .explain-line strong { font-size:12px; line-height:1.2; }
 .explain-line span { font-size:11px; line-height:1.2; }
+
+/* CODE EXPLAIN layout only — no outer geometry changes */
+.explain-terminal-body {
+  padding:10px 12px;
+  overflow:hidden;
+}
+.explain-line {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:2px;
+  margin:0 0 10px;
+  padding:0;
+  font-size:12px;
+  line-height:1.2;
+}
+.explain-line strong {
+  display:block;
+  font-size:12px;
+  line-height:1.2;
+  white-space:nowrap;
+}
+.explain-line span {
+  display:block;
+  padding-left:14px;
+  font-size:11px;
+  line-height:1.25;
+  overflow-wrap:normal;
+  word-break:normal;
+}
+.explain-terminal-head {
+  padding:8px 12px 6px;
+}
+.explain-terminal-foot {
+  padding:2px 12px 8px;
+}
