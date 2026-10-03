@@ -19,10 +19,10 @@ button { font: inherit; }
   --bg:#171a18; --case:#2a2e29; --case2:#111411; --ink:#e2e8dd; --muted:#929b91;
   --key:#343a34; --key-edge:#555e55; --screen:#020604; --green:#70ff8c;
 }
-.workspace { width:min(1800px,calc(100vw - 24px)); max-width:none; margin:0 auto; display:grid; grid-template-columns:minmax(0,1fr) minmax(220px,297px); gap:16px; }
+.workspace { max-width:1500px; margin:0 auto; display:grid; grid-template-columns:minmax(0,4fr) minmax(220px,1fr); gap:16px; }
 .screen-shell { min-height:clamp(300px,47vh,560px); border:10px solid var(--case2); outline:2px solid rgba(0,0,0,.3); border-radius:8px; background:var(--screen); color:var(--green); box-shadow:inset 0 0 45px rgba(78,255,116,.09),0 10px 25px rgba(0,0,0,.16); display:grid; grid-template-rows:auto 1fr auto; overflow:hidden; }
-.screen-topline,.screen-footer { display:flex; justify-content:space-between; gap:12px; padding:10px 16px; border:0; font-size:12px; letter-spacing:.12em; }
-.screen-footer { border:0; color:#8ab895; }
+.screen-topline,.screen-footer { display:flex; justify-content:space-between; gap:12px; padding:10px 16px; border-bottom:1px solid var(--green-dim); font-size:12px; letter-spacing:.12em; }
+.screen-footer { border-top:1px solid var(--green-dim); border-bottom:0; color:#8ab895; }
 .screen-status { color:#a3ffb4; }
 .screen-content { display:flex; flex-direction:column; justify-content:center; padding:clamp(24px,4vw,70px); overflow:hidden; }
 .screen-kicker { margin:0 0 22px; color:#76a982; font-size:clamp(12px,1.1vw,16px); letter-spacing:.12em; text-transform:uppercase; }
@@ -76,73 +76,3 @@ button { font: inherit; }
   .panel-heading,.progress-track,.layout-lamp,.panel-actions { grid-column:auto; }
   .trainer-footer { display:none; }
 }
-
-/* Terminal split inside the existing screen: 4/5 code, 1/5 live explanation. */
-.screen-body { min-height:0; display:grid; grid-template-columns:minmax(190px,1fr) minmax(0,4fr); overflow:hidden; }
-.screen-body .screen-content { min-width:0; min-height:0; }
-.screen-live-info { min-width:0; padding:18px 16px; border-right:1px solid var(--green-dim); background:rgba(41,93,56,.07); display:flex; flex-direction:column; gap:13px; overflow:auto; }
-.live-info-title { padding-bottom:10px; color:var(--green); font-size:11px; font-weight:700; letter-spacing:.14em; }
-.live-info-row { display:grid; gap:3px; padding-bottom:9px; }
-.live-info-row span { color:#6f9d79; font-size:9px; letter-spacing:.1em; }
-.live-info-row strong { color:var(--green); font-size:12px; overflow-wrap:anywhere; }
-@media (max-width:900px) {
-  .screen-body { grid-template-columns:minmax(170px,26%) minmax(0,1fr); }
-  .screen-live-info { padding:14px 10px; }
-}
-@media (max-width:560px) {
-  .screen-body { grid-template-columns:1fr; }
-  .screen-live-info { display:none; }
-}
-
-/* Two terminal panes inside the unchanged main screen dimensions. */
-.screen-body { min-height:0; display:grid; grid-template-columns:minmax(190px,1fr) minmax(0,4fr); gap:0; padding:0; overflow:hidden; }
-.explain-terminal,.lesson-terminal { min-width:0; min-height:0; border:0; background:rgba(0,0,0,.12); overflow:hidden; }
-.explain-terminal { display:grid; grid-template-rows:auto minmax(0,1fr) auto; }
-.explain-terminal-head,.explain-terminal-foot { padding:9px 11px; font-size:10px; letter-spacing:.11em; color:var(--green); }
-.explain-terminal-head { font-weight:700; }
-.explain-terminal-foot { color:#8ab895; }
-.explain-terminal-body { padding:12px 10px; overflow:auto; }
-.explain-line { display:grid; gap:2px; padding:6px 0; color:#6f9d79; }
-.explain-line strong { color:var(--green); font-size:11px; }
-.explain-line span { padding-left:13px; font-size:9px; line-height:1.25; }
-.explain-line.active { opacity:1; }
-.lesson-terminal { display:flex; }
-.lesson-terminal .screen-content { width:100%; min-height:0; }
-@media (max-width:900px) {
-  .screen-body { grid-template-columns:minmax(170px,26%) minmax(0,1fr); gap:0; padding:0; }
-}
-@media (max-width:560px) {
-  .screen-body { grid-template-columns:1fr; }
-  .explain-terminal { display:none; }
-}
-
-.screen-top-actions { display:flex; align-items:center; gap:10px; }
-.hamburger,.screen-back,.terminal-menu-tabs button { border:1px solid var(--green-dim); background:transparent; color:var(--green); font:inherit; cursor:pointer; }
-.hamburger { width:28px; height:24px; padding:0; font-size:15px; line-height:1; }
-.terminal-menu { width:100%; min-height:0; display:grid; grid-template-rows:auto 1fr auto; padding:18px; }
-.terminal-menu-tabs { display:flex; gap:8px; padding-bottom:10px; }
-.terminal-menu-tabs button { padding:6px 9px; font-size:10px; letter-spacing:.08em; }
-.terminal-menu-tabs button.active { background:var(--green); color:var(--screen); }
-.terminal-menu-content { align-self:center; justify-self:center; width:min(520px,90%); display:grid; gap:12px; text-align:center; }
-.terminal-menu-content strong { color:var(--green); font-size:18px; }
-.terminal-menu-content span,.terminal-menu-content small { color:#8ab895; line-height:1.45; }
-.screen-back { justify-self:end; padding:7px 10px; font-size:10px; }
-.explain-line.future { opacity:.38; }
-.explain-line.done { opacity:.68; }
-.explain-line.active { opacity:1; background:rgba(113,255,141,.06); }
-
-.side-menu-tabs { min-height:0; padding:12px 10px; display:flex; flex-direction:column; gap:9px; overflow:auto; }
-.side-menu-tabs button { width:100%; padding:9px 8px; border:1px solid var(--green-dim); background:transparent; color:var(--green); font:inherit; font-size:10px; letter-spacing:.08em; text-align:left; cursor:pointer; }
-.side-menu-tabs button.active { background:var(--green); color:var(--screen); }
-.course-choice-list { display:grid; gap:9px; }
-.course-choice-list button { display:grid; gap:4px; padding:12px; border:1px solid var(--green-dim); background:transparent; color:var(--green); font:inherit; text-align:left; cursor:pointer; }
-.course-choice-list button.selected { background:rgba(113,255,141,.09); box-shadow:inset 3px 0 0 var(--green); }
-.course-choice-list button span { color:#8ab895; font-size:10px; }
-
-/* Main terminal: no internal horizontal rules; exactly one vertical divider. */
-.explain-terminal { border:0 !important; border-right:1px solid var(--green-dim) !important; }
-.lesson-terminal { border:0 !important; }
-.screen-topline,.screen-footer,.explain-terminal-head,.explain-terminal-foot,.terminal-menu-tabs { border-top:0 !important; border-bottom:0 !important; }
-
-.screen-shell { min-height:clamp(300px,47vh,560px); grid-template-rows:auto 1fr auto; }
-.screen-body { height:100%; min-height:0; gap:0 !important; padding:0 !important; }
